@@ -6,7 +6,7 @@ USERID="cmelton"
 
 # This class represents a google instance that will be run in the future
 class Instance:
-    def __init__(self, name, node_params, depedencies, read_disks, read_write_disks, boot_disk, myDriver, script, log, scriptAsParam=True):
+    def __init__(self, name, node_params, depedencies, read_disks, read_write_disks, boot_disk, myDriver, script, log, rootdir, scriptAsParam=True):
         self.name=name
         self.node_params=node_params
         self.dependencyNames=depedencies
@@ -23,6 +23,7 @@ class Instance:
         self.failed=False
         self.printToLog("initialized instance class")
         self.status="not started"
+        self.rootdir=rootdir
         self.ssh_error_counter = 0
 
     def __str__(self):
@@ -160,7 +161,7 @@ class Instance:
         result = "\n#! /bin/bash"
 #         result += "".join(map(lambda x: "\ngcutil cp gs://cmelton_wgs1/"+x+" /home/cmelton/GCE_Cluster/Worker/", ["InstanceData.py", "InstanceEngine.py", "Startup.py"]))
 #         print result
-        result += "\n/usr/local/bin/python2.7 /home/cmelton/GCE_Cluster/Worker/Startup.py --S \""+script.replace("\'", "'")+"\" --SD \""+shutdownscript.replace("\'", "'")+"\" --H /home/cmelton/StartupCommandHistoryv2.pickle --N "+self.name
+        result += "\n/usr/local/bin/python2.7 "+self.rootdir+"DynamicDiskCloudSoftware/Worker/Startup.py --S \""+script.replace("\'", "'")+"\" --SD \""+shutdownscript.replace("\'", "'")+"\" --H /home/cmelton/StartupCommandHistoryv2.pickle --N "+self.name
         return(result)
     
     # create and run node on GCE

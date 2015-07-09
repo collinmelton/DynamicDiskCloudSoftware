@@ -18,11 +18,12 @@ class JobAndDiskFileReader(object):
     This class reads in job and and disk info.
     '''
     
-    def __init__(self, job_csv_file, disk_csv_file, myDriver, log):
+    def __init__(self, job_csv_file, disk_csv_file, myDriver, log, rootdir):
         self.job_csv_file=job_csv_file
         self.disk_csv_file=disk_csv_file
         self.myDriver=myDriver
         self.log=log
+        self.rootdir=rootdir
     
     def trycommand(self, func, *args, **kwargs):
         retries = 10
@@ -175,7 +176,7 @@ class JobAndDiskFileReader(object):
                 result[newInstInfo['name']]=Instance(newInstInfo['name'], node_params,
                                                      newInstInfo['dependencies'],
                                                      read_disks, read_write_disks, boot_disk, myDriver,
-                                                     newInstInfo['script'], log)
+                                                     newInstInfo['script'], log, self.rootdir)
         return result
     
     def readInJobInfo(self):

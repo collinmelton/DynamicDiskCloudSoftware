@@ -11,7 +11,7 @@ class JobManager(object):
     '''
     This class manages the jobs and instances.
     '''
-    def __init__(self, job_csv_file, disk_csv_file, myDriver, log, storage_directory, max_instances, update=True):
+    def __init__(self, job_csv_file, disk_csv_file, myDriver, log, storage_directory, max_instances, rootdir, update=True):
         '''
         Constructor
         '''
@@ -19,7 +19,7 @@ class JobManager(object):
         self.disk_csv_file=disk_csv_file
         self.myDriver=myDriver
         self.log=log
-        jobInfoReader=JobAndDiskFileReader(job_csv_file, disk_csv_file, myDriver, log)
+        jobInfoReader=JobAndDiskFileReader(job_csv_file, disk_csv_file, myDriver, log, rootdir)
         self.instances, self.disks = jobInfoReader.readInJobInfo()
         self.instanceManager=InstanceManager(myDriver, self.instances, storage_directory, log)
         self.running_instances=0
