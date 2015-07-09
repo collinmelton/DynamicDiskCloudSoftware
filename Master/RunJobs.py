@@ -39,7 +39,7 @@ def getOptions():
                       metavar = "STRING", default = '22', type = "string")
     parser.add_option("--HR", dest = "hardRestart", help = "if T shut down all current instances and disks",
                       metavar = "STRING", default = 'F', type = "string")
-    parser.add_option("--HR", dest = "rootdir", help = "directory of cloud software project on worker instances",
+    parser.add_option("--RD", dest = "rootdir", help = "directory of cloud software project on worker instances",
                       metavar = "STRING", type = "string")
     (options, args) = parser.parse_args()
     return options
