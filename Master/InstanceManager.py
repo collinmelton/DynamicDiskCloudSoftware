@@ -28,7 +28,7 @@ class InstanceManager(object):
     # retrieves instance data via scp
     def retrieveInstanceData(self, instance_name):
         self.log.write("retrieving instance data for "+instance_name)
-        myfile=self.rootdir+"StartupCommandHistoryv2.pickle"
+        myfile=self.rootdir+"StartupCommandHistoryv3.pickle"
         destination=os.path.join(self.instanceStorageDirectory, instance_name+".history.pickle")
         errored=True
         i=0
