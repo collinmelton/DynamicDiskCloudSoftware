@@ -14,7 +14,7 @@ class InstanceManager(object):
     data about whether the instance is completed and what its memory/cpu usage is.
     '''
 
-    def __init__(self, myDriver, instances, instanceStorageDirectory, log):
+    def __init__(self, myDriver, instances, instanceStorageDirectory, log, rootdir):
         '''
         Constructor
         '''
@@ -23,11 +23,12 @@ class InstanceManager(object):
         self.instanceStorageDirectory=instanceStorageDirectory
         self.instanceInfo={} # maps instances to most recent status
         self.log = log
+        self.rootdir=rootdir
     
     # retrieves instance data via scp
     def retrieveInstanceData(self, instance_name):
         self.log.write("retrieving instance data for "+instance_name)
-        myfile="/home/cmelton/StartupCommandHistoryv2.pickle"
+        myfile=self.rootdir+"StartupCommandHistoryv2.pickle"
         destination=os.path.join(self.instanceStorageDirectory, instance_name+".history.pickle")
         errored=True
         i=0

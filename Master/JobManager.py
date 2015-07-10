@@ -21,7 +21,7 @@ class JobManager(object):
         self.log=log
         jobInfoReader=JobAndDiskFileReader(job_csv_file, disk_csv_file, myDriver, log, rootdir)
         self.instances, self.disks = jobInfoReader.readInJobInfo()
-        self.instanceManager=InstanceManager(myDriver, self.instances, storage_directory, log)
+        self.instanceManager=InstanceManager(myDriver, self.instances, storage_directory, log, rootdir)
         self.running_instances=0
         self.max_instances=max_instances
         if update:
