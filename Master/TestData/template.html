@@ -1,0 +1,22 @@
+<html>
+  <style type="text/css"> @import url("http://www.stanford.edu/stanfordmodern/css/stanfordmodern.css") </style>
+  <head>
+  <title>%(name)s</title>
+    <script src="http://www.google.com/jsapi" type="text/javascript"></script>
+    <script>
+      google.load("visualization", "1", {packages:["table"]});
+
+      google.setOnLoadCallback(drawTable);
+      function drawTable() {
+        %(jscode)s
+        var jscode_table = new google.visualization.Table(document.getElementById('table_div_jscode'));
+        jscode_table.draw(jscode_data, {showRowNumber: false, allowHtml: true});
+
+      }
+    </script>
+  </head>
+  <body>
+    <H1>%(name)s</H1>
+    <div id="table_div_jscode"></div>
+  </body>
+</html>
