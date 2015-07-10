@@ -27,14 +27,14 @@ class Disk:
         return self.name
 
     def mount_script(self, isWrite):
-        result="mkdir -p /mnt/"+self.name
+        result="sudo mkdir -p /mnt/"+self.name
         if self.formatted:
             if isWrite:
-                result+="\nmount /dev/disk/by-id/google-"+self.name+" /mnt/"+self.name+" -t ext4"
+                result+="\nsudo mount /dev/disk/by-id/google-"+self.name+" /mnt/"+self.name+" -t ext4"
             else:
-                result+="\nmount -o ro,noload /dev/disk/by-id/google-"+self.name+" /mnt/"+self.name+" -t ext4"
+                result+="\nsudo mount -o ro,noload /dev/disk/by-id/google-"+self.name+" /mnt/"+self.name+" -t ext4"
         else:
-            result+="\n/usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' /dev/disk/by-id/google-"+self.name+" /mnt/"+self.name
+            result+="\nsudo /usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' /dev/disk/by-id/google-"+self.name+" /mnt/"+self.name
 #         if isWrite:
 #             result+="\nchmod a+w /mnt/"+self.name
 #         else:
