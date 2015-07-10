@@ -76,6 +76,8 @@ From the GCE developers console boot a new instance. I've chosen CENTOS6.6 as th
 	sudo /usr/local/bin/pip2.7 install httplib2
 
 	sudo /usr/local/bin/pip2.7 install psutil
+
+	sudo /usr/local/bin/pip2.7 install -U https://github.com/google/google-visualization-python/zipball/master
 	
 ## Create Image and Save to Cloud Storage
 
@@ -106,4 +108,4 @@ You should make a pem file and note your service account email address in the fo
 
 # Run Test
 
-	python2.7 RunJobs.py --I test_instances.csv --D test_disks.csv --P gbsc-gcp-lab-snyder --PM test.pem --E 875996339847-nv3l8p9pp4ervtpsg1gbpbabktd619db@developer.gserviceaccount.com
+	python2.7 RunJobs.py --I test_instances.csv --D test_disks.csv --P yourprojectname --PM test.pem --E somelettersandnumbers@developer.gserviceaccount.com --SD ./

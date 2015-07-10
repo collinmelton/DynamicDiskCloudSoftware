@@ -1,1 +1,1 @@
-run,notes,name,size,location,snapshot,image,job_multiplicity,job_id,,$JOBIDboot$JOBMULT-step1,10,DEFAULT,DEFAULT,cloudtest2,1,test1,,$JOBIDboot$JOBMULT-step2,10,DEFAULT,DEFAULT,cloudtest2,1,test1,,$JOBIDdisk$JOBMULT-steps1and2,20,DEFAULT,DEFAULT,cloudtest2,1,test1
+run,notes,name,size,location,snapshot,image,job_multiplicity,job_id,,$JOBIDboot$JOBMULT-step1,10,DEFAULT,DEFAULT,cloudtest2,1,test1,,$JOBIDboot$JOBMULT-step2,10,DEFAULT,DEFAULT,cloudtest2,1,test1,,$JOBIDdisk$JOBMULT-z,20,DEFAULT,DEFAULT,cloudtest2,1,test1
