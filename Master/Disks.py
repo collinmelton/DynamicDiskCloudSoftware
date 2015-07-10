@@ -43,7 +43,7 @@ class Disk:
         return result
     
     def unmount_script(self):
-        result = "umount /mnt/"+self.name
+        result = "sudo umount /mnt/"+self.name
         return result 
     
     def setDisk(self, disks):
