@@ -78,19 +78,6 @@ From the GCE developers console boot a new instance. I've chosen CENTOS6.6 as th
 	sudo /usr/local/bin/pip2.7 install psutil
 
 	sudo /usr/local/bin/pip2.7 install -U https://github.com/google/google-visualization-python/zipball/master
-	
-## Create Image and Save to Cloud Storage
-
-	sudo gcimagebundle -d /dev/sda -o /tmp/ --log_file=/tmp/abc.log
-	
-	** check to see name of the image file from output of above command and edit commands below with this name **
-	
-	gsutil cp /tmp/imagename.image.tar.gz gs://yourbucketname/
-	
-	** below you can name your image, I've name the image cloudtest **
-	
-	~/google-cloud-sdk/bin/gcutil --project "your_project_name" addimage cloudtest gs://yourbucketname/imagename.image.tar.gz
-
 
 ## Configure SSH Keys
 
@@ -100,6 +87,29 @@ From the GCE developers console boot a new instance. I've chosen CENTOS6.6 as th
 	
 	ssh-add ~/.ssh/id_rsa
 
+	edit ~/.ssh/authorized keys by adding the key located in ~/.ssh/id_rsa.pub, in this setup the master running this image will have the same public key as the worker and we want the master to be able to ssh into the worker so we need to add the master's public key to the list of authorized keys 
+
+## Authorize the instance with gcloud auth login
+
+	** I also did an auth login so I could copy to my cloud storage bucket in next step, I didn't expect to need to do this as the instance should have been authorized to access cloud storage during creation, it might have to do with our project configuration settings or my misunderstanding of how things work
+	
+	gcloud auth login
+
+## Create Image and Save to Cloud Storage
+
+	sudo gcimagebundle -d /dev/sda -o /tmp/ --log_file=/tmp/abc.log
+	
+	** check to see name of the image file from output of above command and edit commands below with this name **
+	
+	gsutil cp /tmp/imagename.image.tar.gz gs://yourbucketname/
+	
+	** below you can name your image, I've name the image cloudtest2, I think this can also be done with gcloud ** 
+	
+	~/google-cloud-sdk/bin/gcutil --project "your_project_name" addimage cloudtest2 gs://yourbucketname/imagename.image.tar.gz
+	or 
+	gcloud compute images create cloudtest2 --source-uri gs://yourbucketname/imagename.image.tar.gz
+
+
 # Get Service Account Authentication Info
 In order to run the software you need to get a service account email address and a pem file. See instructions here: https://cloud.google.com/storage/docs/authentication#service_accounts
 
@@ -108,4 +118,7 @@ You should make a pem file and note your service account email address in the fo
 
 # Run Test
 
-	python2.7 RunJobs.py --I test_instances.csv --D test_disks.csv --P yourprojectname --PM test.pem --E somelettersandnumbers@developer.gserviceaccount.com --SD ./
+	** Use the GCE Instance used to create the image above or make a new instance with access to compute and storage authorized with the image you created above. **
+	** Navigate to the directory for this project then go to the Master folder. **
+	python2.7 RunJobs.py --I test_instances.csv --D test_disks.csv --P yourprojectname --PM test.pem --E somelettersandnumbers@developer.gserviceaccount.com --RD /home/yourusername/ --SD ./
+	
