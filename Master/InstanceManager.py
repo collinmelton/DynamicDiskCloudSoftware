@@ -34,7 +34,7 @@ class InstanceManager(object):
         i=0
         while errored:
 #             errored=(subprocess.call(['gcutil', 'pull', instance_name, myfile, destination])!=0)
-            errored=(subprocess.call(['scp', '-o', 'stricthostkeychecking=no', instance_name+":"+myfile, destination])!=0)
+            errored=(subprocess.call(['scp', '-o', 'stricthostkeychecking=no', '-o', 'UserKnownHostsFile=/dev/null', instance_name+":"+myfile, destination])!=0)
             if errored:
                 i+=1
                 if i==3: 
