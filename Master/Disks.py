@@ -26,6 +26,12 @@ class Disk:
     def __repr__(self):
         return self.name
 
+    def contentRestore(self, restoreProgramPath):
+        return restoreProgramPath+ "--P /mnt/"+self.name +" --F /mnt/"+self.name+"/"+"disk.content"
+
+    def contentSave(self, saveProgramPath):
+        return saveProgramPath+ "--P /mnt/"+self.name +" --F /mnt/"+self.name+"/"+"disk.content"
+
     def mount_script(self, isWrite):
         result="mkdir -p /mnt/"+self.name
         if self.formatted:

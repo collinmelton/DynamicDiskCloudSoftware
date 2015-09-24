@@ -91,6 +91,7 @@ class Instance:
         return True
 
     # check if ready and if yes start job
+
     def startIfReady(self, jobs):
         # if already run do nothing
         if self.status=="complete": return False
@@ -107,8 +108,7 @@ class Instance:
 #             self.destroy()
 #             self.create()
 #             return True
-        
-            
+                    
     def setInstances(self, nodes):
         for node in nodes:
 #             self.log.write(self.name+"|"+node.name)
@@ -138,23 +138,24 @@ class Instance:
 #         return("\n".join(map(lambda x: "\t"+str(x), [self.name, self.node_params, self.dependencyNames, self.read_disks, 
 #                                                 self.boot_disk, self.myDriver, self.created, self.destroyed, 
 #                                                 self.script, self.node, self.log, self.scriptAsParam, self.failed])))
-        
-
-    
+            
     def _mountDisksScript(self):
         read_only=map(lambda disk: disk.mount_script(False), self.read_disks)
         read_write=map(lambda disk: disk.mount_script(True), self.read_write_disks)
-        result= "\n".join(read_only+read_write)
+        read_write_disk_restore = map(lambda disk: disk.contentRestore(self.rootdir+"DynamicDiskCloudSoftware/Worker/restoreDiskContent.py"), self.read_write_disks)
+        result= "\n".join(read_only+read_write+read_write_disk_restore)
         return result
     
     def _unmountDisksScript(self):
         read_only=map(lambda disk: disk.unmount_script(), self.read_disks)
         read_write=map(lambda disk: disk.unmount_script(), self.read_write_disks)
-        result= "\n".join(read_only+read_write)
+        read_write_save=map(lambda disk: disk.contentSave(self.rootdir+"DynamicDiskCloudSoftware/Worker/writeDiskContentFile.py"), self.read_write_disks)
+        result= "\n".join(read_write_save+read_only+read_write)
         return result
     
     # package script in python script shell
     # the StartupWrapper.py program executes the script, saves the output to google cloud storage and updates the project meta data on start and completion
+
     def packageScript(self):
         script = self._mountDisksScript()+"\n"+self.script
         shutdownscript = self._unmountDisksScript()
@@ -165,6 +166,7 @@ class Instance:
         return(result)
     
     # create and run node on GCE
+
     def create(self):
         if not self.created: 
             #raise Exception('Trying to create already created instance on '+self.name)
@@ -214,6 +216,7 @@ class Instance:
         else: self.printToLog("instance already created on GCE")
     
     # destroy node on GCE
+    
     def destroy(self, instances=None, destroydisks=True, force = False):
         # detatch disks and destroy if not needed
         for disk in self.read_disks:
