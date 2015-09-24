@@ -6,7 +6,7 @@ USERID="cmelton"
 
 # This class represents a google instance that will be run in the future
 class Instance:
-    def __init__(self, name, node_params, depedencies, read_disks, read_write_disks, boot_disk, myDriver, script, log, rootdir, scriptAsParam=True):
+    def __init__(self, name, node_params, depedencies, read_disks, read_write_disks, boot_disk, myDriver, script, log, rootdir="/home/cmelton/", scriptAsParam=True):
         self.name=name
         self.node_params=node_params
         self.dependencyNames=depedencies
@@ -148,8 +148,8 @@ class Instance:
     
     def _unmountDisksScript(self):
         read_only=map(lambda disk: disk.unmount_script(), self.read_disks)
-        read_write=map(lambda disk: disk.unmount_script(), self.read_write_disks)
         read_write_save=map(lambda disk: disk.contentSave(self.rootdir+"DynamicDiskCloudSoftware/Worker/writeDiskContentFile.py"), self.read_write_disks)
+        read_write=map(lambda disk: disk.unmount_script(), self.read_write_disks)
         result= "\n".join(read_write_save+read_only+read_write)
         return result
     
