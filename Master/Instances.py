@@ -37,11 +37,15 @@ class Instance:
             self.__updateStatus(instanceManager)
 
     def manual_restart(self):
+        self.printToLog("performing manual restart")
         self.destroy(instances=None, destroydisks=False, force = False)
         self.create()
         
     def restart(self):
-        result = self.trycommand(self.myDriver.reboot_node, self.node)
+        self.updateNode()
+        result = None
+        if self.node != None:
+            result = self.trycommand(self.myDriver.reboot_node, self.node)
         if result == None:
             self.manual_restart()
         self.printToLog("created instance on GCE")
@@ -143,7 +147,6 @@ class Instance:
     def _mountDisksScript(self):
         read_only=map(lambda disk: disk.mount_script(False), self.read_disks)
         read_write=map(lambda disk: disk.mount_script(True), self.read_write_disks)
-        print self.rootdir
         read_write_disk_restore = map(lambda disk: disk.contentRestore("/usr/local/bin/python2.7 "+self.rootdir+"DynamicDiskCloudSoftware/Worker/restoreDiskContent.py"), self.read_write_disks)
         result= "\n".join(read_only+read_write+read_write_disk_restore)
         return result
@@ -241,7 +244,7 @@ class Instance:
             self.trycommand(self.myDriver.destroy_node, self.node)
             self.node=None
             self.printToLog("destroyed instance on GCE")
-            self.boot_disk.destroy()
+            # self.boot_disk.destroy() # boot disk seems to destroy itself so commenting this out
             self.destroyed=True
             self.created=False
         else:
@@ -252,7 +255,7 @@ class Instance:
 
     def trycommand(self, func, *args, **kwargs):
         tries = 0
-        retries = 5
+        retries = 3
         while tries<retries:
             try:
                 x = func(*args, **kwargs)

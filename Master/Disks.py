@@ -81,11 +81,14 @@ class Disk:
             self.instanceNames.append(instanceName)
 
     def create(self):
-        self.printToLog("created disk on GCE")
+        self.printToLog("trying ot create disk... destroyed: "+str(self.destroyed)+" created: "+str(self.created)+" None: "+str(self.disk==None))
         if self.destroyed or not self.created:
             self.disk=self.trycommand(self.myDriver.create_volume, self.size, self.name, location=self.location, snapshot=self.snapshot, image=self.image)
             self.created=True
             self.destroyed=False
+            self.printToLog("created disk on GCE")
+        else:
+            self.printToLog("did not create disk on GCE")
     
     def updateDisk(self):
         self.disk=self.trycommand(self.myDriver.ex_get_volume, self.name)
