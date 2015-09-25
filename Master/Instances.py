@@ -39,6 +39,8 @@ class Instance:
     def manual_restart(self):
         self.printToLog("performing manual restart")
         self.destroy(instances=None, destroydisks=False, force = False)
+        for node in self.driver.list_nodes():
+            print node.__dict__ 
         self.create()
         
     def restart(self):
@@ -62,7 +64,7 @@ class Instance:
         if self.status == "ssh error":
             self.ssh_error_counter +=1
             self.printToLog("recurrent ssh error on "+self.name+", count="+str(self.ssh_error_counter))
-            if self.ssh_error_counter == 2: 
+            if self.ssh_error_counter == 1: 
                 self.printToLog("setting status of "+self.name+" to gce error")
                 self.restart()
             if self.ssh_error_counter == 4:
