@@ -26,7 +26,7 @@ class LogFile():
         # write time then add text to write
         f.write("\n"+datetime.datetime.now().strftime("%Y-%m-%d %H:%M")+"\t")
         f.write(str(textToWrite))
-#         print textToWrite
+        print "log: ", textToWrite
         if f: f.close()
         self.lock.release()
     

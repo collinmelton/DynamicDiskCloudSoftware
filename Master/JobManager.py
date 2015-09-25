@@ -37,7 +37,7 @@ class JobManager(object):
     # returns true if jobs remain, false otherwise
     def remainingJobs(self):
         for job in self.instances:
-            if (not self.instances[job].started()) and (not self.instances[job].destroyed and not self.instances[job].status=="failed"): return True
+            if (not self.instances[job].started()) and (not self.instances[job].destroyed and not self.instances[job].status in ["failed", "gce error"]): return True
         return False
     
     # starts all jobs that are ready to run

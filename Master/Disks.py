@@ -87,7 +87,12 @@ class Disk:
             self.created=True
             self.destroyed=False
     
+    def updateDisk(self):
+        self.disk=self.trycommand(self.myDriver.ex_get_volume, self.name)
+        if self.disk == None: self.destroyed=True
+    
     def destroy(self):
+        self.updateDisk()
         if self.created and not self.destroyed:
 #             if 'download' not in self.name: 
             self.trycommand(self.myDriver.destroy_volume,self.disk)

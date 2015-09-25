@@ -221,23 +221,27 @@ class Instance:
     
     #self.destroy(instances=None, destroydisks=False, force = False)
     
+    def updateNode(self):
+        self.node=self.trycommand(self.myDriver.ex_get_node, self.name)
+        if self.node == None: self.destroyed=True
+    
     def destroy(self, instances=None, destroydisks=True, force = False):
+        self.updateNode()
         # detatch disks and destroy if not needed
         for disk in self.read_disks:
-            if not force: disk.detach(self)
+            if not force and self.node!=None: disk.detach(self)
             if destroydisks:
                 disk.destroyifnotneeded(instances)
         for disk in self.read_write_disks:
-            if not force: disk.detach(self)
+            if not force and self.node!=None: disk.detach(self)
             if destroydisks: 
                 disk.destroyifnotneeded(instances)
-            # self.myDriver.destroy_node(self.node)
         # destroy node
         if self.node!=None and not self.destroyed:
             self.trycommand(self.myDriver.destroy_node, self.node)
             self.node=None
             self.printToLog("destroyed instance on GCE")
-#             self.boot_disk.destroy()
+            self.boot_disk.destroy()
             self.destroyed=True
             self.created=False
         else:
@@ -247,8 +251,8 @@ class Instance:
         
 
     def trycommand(self, func, *args, **kwargs):
-        retries = 5
         tries = 0
+        retries = 5
         while tries<retries:
             try:
                 x = func(*args, **kwargs)
