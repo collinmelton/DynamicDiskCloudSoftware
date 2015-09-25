@@ -81,7 +81,7 @@ class Disk:
             self.instanceNames.append(instanceName)
 
     def create(self):
-        self.printToLog("trying ot create disk... destroyed: "+str(self.destroyed)+" created: "+str(self.created)+" None: "+str(self.disk==None))
+        self.printToLog("trying to create disk... destroyed: "+str(self.destroyed)+" created: "+str(self.created)+" None: "+str(self.disk==None))
         if self.destroyed or not self.created:
             self.disk=self.trycommand(self.myDriver.create_volume, self.size, self.name, location=self.location, snapshot=self.snapshot, image=self.image)
             self.created=True
@@ -91,6 +91,7 @@ class Disk:
             self.printToLog("did not create disk on GCE")
     
     def updateDisk(self):
+        self.printToLog("updating disk "+self.name)
         self.disk=self.trycommand(self.myDriver.ex_get_volume, self.name)
         if self.disk == None: self.destroyed=True
     
@@ -132,7 +133,7 @@ class Disk:
             self.printToLog("detached disk on GCE from "+inst.name)
 
     def trycommand(self, func, *args, **kwargs):
-        retries = 10
+        retries = 3
         tries = 0
         while tries<retries:
             try:

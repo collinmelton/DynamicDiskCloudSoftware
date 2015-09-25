@@ -44,8 +44,9 @@ class Instance:
     def restart(self):
         self.updateNode()
         result = None
-        if self.node != None:
-            result = self.trycommand(self.myDriver.reboot_node, self.node)
+#         reboot doesn't seem to work so commenting out
+#         if self.node != None:
+#             result = self.trycommand(self.myDriver.reboot_node, self.node)
         if result == None:
             self.manual_restart()
         self.printToLog("created instance on GCE")
@@ -204,6 +205,7 @@ class Instance:
             i=0
             while self.node==None:
                 i+=1
+                self.boot_disk.updateDisk()
                 self.node=self.trycommand(self.myDriver.create_node, self.name, self.node_params["size"], self.node_params["image"], location=self.node_params["location"],
                                       ex_network=self.node_params["ex_network"], ex_tags=self.node_params["ex_tags"], ex_metadata=self.node_params["ex_metadata"], 
                                       ex_boot_disk=self.boot_disk.disk, serviceAccountScopes=["https://www.googleapis.com/auth/compute", "https://www.googleapis.com/auth/devstorage.read_write"], 
