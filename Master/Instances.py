@@ -268,7 +268,7 @@ class Instance:
                 e = sys.exc_info()[0]
                 tries +=1
                 time.sleep(10)
-                self.printToLog(str(func) + " Error: "+str(e)+ " try #"+str(tries)) 
+                self.printToLog(str(func) + " Error: "+str(e)+", "+str(e.__dict__)+ " try #"+str(tries)) 
         return None
                 
                 
