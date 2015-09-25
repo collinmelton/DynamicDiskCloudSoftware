@@ -237,7 +237,7 @@ class Instance:
             self.trycommand(self.myDriver.destroy_node, self.node)
             self.node=None
             self.printToLog("destroyed instance on GCE")
-            self.boot_disk.destroy()
+#             self.boot_disk.destroy()
             self.destroyed=True
             self.created=False
         else:
