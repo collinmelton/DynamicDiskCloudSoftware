@@ -51,6 +51,7 @@ class Instance:
         self.status="started"
 
     # update status and destroy if complete
+    
     def __updateStatus(self, instanceManager):
         self.status = self.trycommand(instanceManager.getInstanceStatus, self.name)
         if self.status == "ssh error":
@@ -143,13 +144,13 @@ class Instance:
         read_only=map(lambda disk: disk.mount_script(False), self.read_disks)
         read_write=map(lambda disk: disk.mount_script(True), self.read_write_disks)
         print self.rootdir
-        read_write_disk_restore = map(lambda disk: disk.contentRestore(self.rootdir+"DynamicDiskCloudSoftware/Worker/restoreDiskContent.py"), self.read_write_disks)
+        read_write_disk_restore = map(lambda disk: disk.contentRestore("/usr/local/bin/python2.7 "+self.rootdir+"DynamicDiskCloudSoftware/Worker/restoreDiskContent.py"), self.read_write_disks)
         result= "\n".join(read_only+read_write+read_write_disk_restore)
         return result
     
     def _unmountDisksScript(self):
         read_only=map(lambda disk: disk.unmount_script(), self.read_disks)
-        read_write_save=map(lambda disk: disk.contentSave(self.rootdir+"DynamicDiskCloudSoftware/Worker/writeDiskContentFile.py"), self.read_write_disks)
+        read_write_save=map(lambda disk: disk.contentSave("/usr/local/bin/python2.7 "+self.rootdir+"DynamicDiskCloudSoftware/Worker/writeDiskContentFile.py"), self.read_write_disks)
         read_write=map(lambda disk: disk.unmount_script(), self.read_write_disks)
         result= "\n".join(read_write_save+read_only+read_write)
         return result
@@ -217,6 +218,8 @@ class Instance:
         else: self.printToLog("instance already created on GCE")
     
     # destroy node on GCE
+    
+    #self.destroy(instances=None, destroydisks=False, force = False)
     
     def destroy(self, instances=None, destroydisks=True, force = False):
         # detatch disks and destroy if not needed
