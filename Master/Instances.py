@@ -39,7 +39,7 @@ class Instance:
     def manual_restart(self):
         self.printToLog("performing manual restart")
         self.destroy(instances=None, destroydisks=False, force = False)
-        for node in self.driver.list_nodes():
+        for node in self.myDriver.list_nodes():
             self.printToLog(str(node.__dict__)) 
         self.create()
         
