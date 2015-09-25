@@ -21,7 +21,7 @@ def getOptions():
 # writes content to a file with each new line separating a filename
 def readContentFile(diskContentFilename):
     f = open(diskContentFilename, 'r')
-    content = f.read().split("\n")
+    content = f.read().split("\n")+[diskContentFilename]
     f.close()
     return content
 
