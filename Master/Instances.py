@@ -6,7 +6,7 @@ USERID="cmelton"
 
 # This class represents a google instance that will be run in the future
 class Instance:
-    def __init__(self, name, node_params, depedencies, read_disks, read_write_disks, boot_disk, myDriver, script, log, rootdir="/home/cmelton/", scriptAsParam=True):
+    def __init__(self, name, node_params, depedencies, read_disks, read_write_disks, boot_disk, myDriver, script, log, rootdir="/home/cmelton/", scriptAsParam=True, preemptible=True):
         self.name=name
         self.node_params=node_params
         self.dependencyNames=depedencies
@@ -25,6 +25,7 @@ class Instance:
         self.status="not started"
         self.rootdir=rootdir
         self.ssh_error_counter = 0
+        self.preemptible = preemptible
 
     def __str__(self):
         return self.name
@@ -212,7 +213,7 @@ class Instance:
                 self.node=self.trycommand(self.myDriver.create_node, self.name, self.node_params["size"], self.node_params["image"], location=self.node_params["location"],
                                       ex_network=self.node_params["ex_network"], ex_tags=self.node_params["ex_tags"], ex_metadata=self.node_params["ex_metadata"], 
                                       ex_boot_disk=self.boot_disk.disk, serviceAccountScopes=["https://www.googleapis.com/auth/compute", "https://www.googleapis.com/auth/devstorage.read_write"], 
-                                      additionalDisks=additionalDisks)
+                                      additionalDisks=additionalDisks, preemptible=self.preemptible)
                 if self.node==None:
                     self.node=self.trycommand(self.myDriver.ex_get_node, self.name)
                 if i==2:

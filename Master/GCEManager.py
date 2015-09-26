@@ -107,7 +107,8 @@ class GCEManager(GCENodeDriver):
     
     def create_node(self, name, size, image, location=None,ex_network='default', 
                     ex_tags=None, ex_metadata=None,ex_boot_disk=None, 
-                    use_existing_disk=True, external_ip='ephemeral', serviceAccountScopes=None, additionalDisks=[]):
+                    use_existing_disk=True, external_ip='ephemeral', serviceAccountScopes=None, additionalDisks=[],
+                    preemptible=False):
         location = location or self.zone
         if not hasattr(location, 'name'):
             location = self.ex_get_zone(location)
@@ -132,6 +133,9 @@ class GCEManager(GCENodeDriver):
               "email": "default"}]
         for diskData in self._disksToDiskData(additionalDisks):
             node_data["disks"].append(diskData)
+        if preemptible:
+            node_data["scheduling"]={'preemptible': True}
+    
         print "request", request
         print "node data", str(node_data)
         self.connection.async_request(request, method='POST', data=node_data)
