@@ -132,7 +132,8 @@ class GCEManager(GCENodeDriver):
               "email": "default"}]
         for diskData in self._disksToDiskData(additionalDisks):
             node_data["disks"].append(diskData)
-        print request
+        print "request", request
+        print "node data", str(node_data)
         self.connection.async_request(request, method='POST', data=node_data)
 
         return self.ex_get_node(name, location.name)

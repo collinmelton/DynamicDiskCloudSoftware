@@ -133,7 +133,7 @@ class Disk:
             self.printToLog("detached disk on GCE from "+inst.name)
 
     def trycommand(self, func, *args, **kwargs):
-        retries = 3
+        retries = 1
         tries = 0
         while tries<retries:
             try:

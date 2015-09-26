@@ -259,7 +259,7 @@ class Instance:
 
     def trycommand(self, func, *args, **kwargs):
         tries = 0
-        retries = 3
+        retries = 1
         while tries<retries:
             try:
                 x = func(*args, **kwargs)
