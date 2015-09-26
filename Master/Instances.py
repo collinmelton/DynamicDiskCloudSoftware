@@ -41,7 +41,7 @@ class Instance:
         self.destroy(instances=None, destroydisks=False, force = False)
         for node in self.myDriver.list_nodes():
             self.printToLog(str(node.__dict__)) 
-        self.create()
+        self.create(restart=True)
         
     def restart(self):
         self.updateNode()
@@ -175,7 +175,7 @@ class Instance:
     
     # create and run node on GCE
 
-    def create(self):
+    def create(self, restart = False):
         if not self.created: 
             #raise Exception('Trying to create already created instance on '+self.name)
             # make sure all necessary disks are created
@@ -192,10 +192,11 @@ class Instance:
                 
             # add startup script to metadata and make sure drive mounting is added to startup script
 #             print self.packageScript()
-            if self.scriptAsParam:
-                self.node_params["ex_metadata"]["items"].append({"key":"startup-script", "value":self.packageScript()})
-            else:
-                raise Exception("deploy with script form file or cloud storage not implemented yet")
+            if not restart:
+                if self.scriptAsParam:
+                    self.node_params["ex_metadata"]["items"].append({"key":"startup-script", "value":self.packageScript()})
+                else:
+                    raise Exception("deploy with script form file or cloud storage not implemented yet")
 #             print self.node_params["ex_metadata"]
             # change mode of disks and prepare them in a list for node creation
             for disk in self.read_disks:
