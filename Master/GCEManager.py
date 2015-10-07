@@ -14,6 +14,7 @@ class GCEManager(GCENodeDriver):
     def __init__(self, user_id, key, datacenter=None, project=None,
                  auth_type=None, **kwargs):
 #         print user_id, key
+        self.service_account_email_address = user_id
         super(GCEManager, self).__init__(user_id, key, datacenter=datacenter, project=project, auth_type=auth_type, **kwargs)
     
     def _diskToDiskData(self, Disk):

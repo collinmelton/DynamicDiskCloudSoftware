@@ -162,11 +162,14 @@ class Instance:
         result= "\n".join(read_write_save+read_only+read_write)
         return result
     
+    def _setActiveGcloudAuthAccount(self):
+        return "gcloud config set account "+self.driver.service_account_email_address
+    
     # package script in python script shell
     # the StartupWrapper.py program executes the script, saves the output to google cloud storage and updates the project meta data on start and completion
 
     def packageScript(self):
-        script = self._mountDisksScript()+"\n"+self.script
+        script = self._mountDisksScript()+"\n"+self._setActiveGcloudAuthAccount()+"\n"+self.script
         shutdownscript = self._unmountDisksScript()
         result = "\n#! /bin/bash"
 #         result += "".join(map(lambda x: "\ngcutil cp gs://cmelton_wgs1/"+x+" /home/cmelton/GCE_Cluster/Worker/", ["InstanceData.py", "InstanceEngine.py", "Startup.py"]))
