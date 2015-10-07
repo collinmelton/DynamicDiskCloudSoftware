@@ -21,7 +21,7 @@ def getOptions():
                       metavar = "STRING", 
                       default = "", 
                       type = "string")
-    parser.add_option("-AA", dest="authAccount", help = "auth account for gcloud access, needs to be a listed account with gcloud auth list on all instance images",
+    parser.add_option("--AA", dest="authAccount", help = "auth account for gcloud access, needs to be a listed account with gcloud auth list on all instance images",
                       metavar = "STRING")
     parser.add_option("--P", dest = "projectID", help = "projectID", metavar = "STRING", 
                       default = "gbsc-gcp-lab-snyder", #"stanford.edu:coral-pipe-530", 
