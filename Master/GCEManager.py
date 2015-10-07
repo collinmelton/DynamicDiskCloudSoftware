@@ -11,10 +11,10 @@ class GCEManager(GCENodeDriver):
     This class is a subclass of GCENodeDriver with the added functionality of allowing
     service accounts in create_node
     '''
-    def __init__(self, user_id, key, datacenter=None, project=None,
+    def __init__(self, user_id, key, auth_account, datacenter=None, project=None,
                  auth_type=None, **kwargs):
 #         print user_id, key
-        self.service_account_email_address = user_id
+        self.auth_account = auth_account
         super(GCEManager, self).__init__(user_id, key, datacenter=datacenter, project=project, auth_type=auth_type, **kwargs)
     
     def _diskToDiskData(self, Disk):

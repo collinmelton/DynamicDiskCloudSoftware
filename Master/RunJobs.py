@@ -21,6 +21,8 @@ def getOptions():
                       metavar = "STRING", 
                       default = "", 
                       type = "string")
+    parser.add_option("-AA", dest="authAccount", help = "auth account for gcloud access, needs to be a listed account with gcloud auth list on all instance images",
+                      metavar = "STRING")
     parser.add_option("--P", dest = "projectID", help = "projectID", metavar = "STRING", 
                       default = "gbsc-gcp-lab-snyder", #"stanford.edu:coral-pipe-530", 
                       type = "string")
@@ -50,7 +52,7 @@ class JobExecutionLoop(object):
     '''
 
     def __init__(self, log_file, job_csv_file, disk_csv_file, service_account_email_address, 
-                 project_id, pem_file, data_center, auth_type, metadata_url, storage_directory, rootdir, cycle_period=60, max_instances=23, restart=False, 
+                 project_id, pem_file, data_center, auth_type, metadata_url, storage_directory, rootdir, auth_account, cycle_period=60, max_instances=23, restart=False, 
                  commandFile = ""):
         '''
         Constructor
@@ -70,13 +72,14 @@ class JobExecutionLoop(object):
         self.restart=restart
         self.commandFile = commandFile
         self.rootdir=rootdir
+        self.auth_account=auth_account
         
     def run(self):
         # get logfile reader
         self.log = LogFile.LogFile(self.log_file)
     
         # get google compute engine driver to interact with the compute engine
-        self.myDriver= GCEManager(self.service_account_email_address, self.pem_file, project=self.project_id)
+        self.myDriver= GCEManager(self.service_account_email_address, self.pem_file, project=self.project_id, self.auth_account)
         
         # start job manager, which has some useful functions for checking on the status and starting jobs
         self.jobManager=JobManager(self.job_csv_file, self.disk_csv_file, self.myDriver, self.log, self.storage_directory, self.max_instances, 
@@ -109,7 +112,7 @@ if __name__ == '__main__':
     engine=JobExecutionLoop(options.logFilePath, options.InstancesFile, options.DisksFile,
                             options.serviceAccountEmail, options.projectID, options.pemFile, 
                             options.dataCenter, options.authType, options.metadataURL, 
-                            options.storageDirectory, options.rootdir, max_instances=int(options.maxInstances),
+                            options.storageDirectory, options.rootdir, options.authAccount, max_instances=int(options.maxInstances),
                             restart=(options.hardRestart=='T'))
     engine.run()
     
