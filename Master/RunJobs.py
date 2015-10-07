@@ -79,7 +79,7 @@ class JobExecutionLoop(object):
         self.log = LogFile.LogFile(self.log_file)
     
         # get google compute engine driver to interact with the compute engine
-        self.myDriver= GCEManager(self.service_account_email_address, self.pem_file, project=self.project_id, self.auth_account)
+        self.myDriver= GCEManager(self.service_account_email_address, self.pem_file, self.auth_account, project=self.project_id)
         
         # start job manager, which has some useful functions for checking on the status and starting jobs
         self.jobManager=JobManager(self.job_csv_file, self.disk_csv_file, self.myDriver, self.log, self.storage_directory, self.max_instances, 
