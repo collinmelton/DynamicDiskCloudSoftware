@@ -101,7 +101,7 @@ class JobAndDiskFileReader(object):
         for newDiskInfo in newDiskInfos:
             result[newDiskInfo['name']]=Disk(newDiskInfo['name'], newDiskInfo['size'], 
                                                    newDiskInfo['location'], newDiskInfo['snapshot'], 
-                                                   myDriver, newDiskInfo['image'], [], log) 
+                                                   myDriver, newDiskInfo['image'], [], log, disk_type = newDiskInfo['disk_type']) 
         return result
     
     def readInstances(self, InstancesFile, myDriver, disks, log):

@@ -4,7 +4,7 @@ import sys, time
 
 
 class Disk:
-    def __init__(self, name, size, location, snapshot, myDriver, image, instanceNames, log):
+    def __init__(self, name, size, location, snapshot, myDriver, image, instanceNames, log, disk_type = 'pd-standard'):
         self.name=name
         self.size=size
         self.location=location
@@ -19,6 +19,7 @@ class Disk:
         self.log=log
         self.printToLog("initialized disk class")
         self.formatted=False
+        self.disk_type=disk_type
 
     def __str__(self):
         return self.name
@@ -83,7 +84,7 @@ class Disk:
     def create(self):
         self.printToLog("trying to create disk... destroyed: "+str(self.destroyed)+" created: "+str(self.created)+" None: "+str(self.disk==None))
         if self.destroyed or not self.created:
-            self.disk=self.trycommand(self.myDriver.create_volume, self.size, self.name, location=self.location, snapshot=self.snapshot, image=self.image)
+            self.disk=self.trycommand(self.myDriver.create_volume, self.size, self.name, location=self.location, snapshot=self.snapshot, image=self.image, ex_disk_type=self.disk_type)
             self.created=True
             self.destroyed=False
             self.printToLog("created disk on GCE")
