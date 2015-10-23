@@ -7,7 +7,8 @@ USERID="cmelton"
 # This class represents a google instance that will be run in the future
 class Instance:
     def __init__(self, name, node_params, depedencies, read_disks, read_write_disks, boot_disk, myDriver, script, log, 
-                 activateStackDriver = False, rootdir="/home/cmelton/", scriptAsParam=True, preemptible=True, StackdriverAPIKey=""):
+                 rootdir="/home/cmelton/", scriptAsParam=True, preemptible=True, StackdriverAPIKey="",
+                 activateStackDriver=False):
         self.name=name
         self.node_params=node_params
         self.dependencyNames=depedencies
