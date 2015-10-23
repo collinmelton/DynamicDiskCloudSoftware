@@ -175,6 +175,7 @@ class JobAndDiskFileReader(object):
                 if newInstInfo['dependencies']==[""]:
                     newInstInfo['dependencies']=[]
                 # add new instance
+                print self.activateStackDriver
                 result[newInstInfo['name']]=Instance(newInstInfo['name'], node_params,
                                                      newInstInfo['dependencies'],
                                                      read_disks, read_write_disks, boot_disk, myDriver,
