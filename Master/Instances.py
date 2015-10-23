@@ -6,7 +6,8 @@ USERID="cmelton"
 
 # This class represents a google instance that will be run in the future
 class Instance:
-    def __init__(self, name, node_params, depedencies, read_disks, read_write_disks, boot_disk, myDriver, script, log, rootdir="/home/cmelton/", scriptAsParam=True, preemptible=True):
+    def __init__(self, name, node_params, depedencies, read_disks, read_write_disks, boot_disk, myDriver, script, log, 
+                 activateStackDriver = False, rootdir="/home/cmelton/", scriptAsParam=True, preemptible=True, StackdriverAPIKey=""):
         self.name=name
         self.node_params=node_params
         self.dependencyNames=depedencies
@@ -26,6 +27,8 @@ class Instance:
         self.rootdir=rootdir
         self.ssh_error_counter = 0
         self.preemptible = preemptible
+        self.activateStackdriver = activateStackDriver
+        self.StackdriverAPIKey = StackdriverAPIKey 
 
     def __str__(self):
         return self.name
@@ -172,6 +175,7 @@ class Instance:
         script = self._mountDisksScript()+"\n"+self._setActiveGcloudAuthAccount()+"\n"+self.script
         shutdownscript = self._unmountDisksScript()
         result = "\n#! /bin/bash"
+        if self.activateStackdriver: result += "\nsudo bash stack-install.sh --api-key="+self.StackdriverAPIKey
 #         result += "".join(map(lambda x: "\ngcutil cp gs://cmelton_wgs1/"+x+" /home/cmelton/GCE_Cluster/Worker/", ["InstanceData.py", "InstanceEngine.py", "Startup.py"]))
 #         print result
         result += "\n/usr/local/bin/python2.7 "+self.rootdir+"DynamicDiskCloudSoftware/Worker/Startup.py --S \""+script.replace("\'", "'")+"\" --SD \""+shutdownscript.replace("\'", "'")+"\" --H "+self.rootdir+"StartupCommandHistoryv3.pickle --N "+self.name

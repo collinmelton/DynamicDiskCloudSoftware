@@ -43,6 +43,10 @@ def getOptions():
                       metavar = "STRING", default = 'F', type = "string")
     parser.add_option("--RD", dest = "rootdir", help = "directory of cloud software project on worker instances",
                       metavar = "STRING", type = "string")
+    parser.add_option("--SDAPI", dest = "StackdriverAPIKey", help = "stackdriver API key",
+                      metavar = "STRING", default = '', type = "string")
+    parser.add_option("--ASD", dest = "activateStackDriver", help = "whether to activate stackdriver on all instances, enter 'T' for True",
+                      default = "F", metavar = "STRING", type = "string")
     (options, args) = parser.parse_args()
     return options
 
@@ -53,7 +57,7 @@ class JobExecutionLoop(object):
 
     def __init__(self, log_file, job_csv_file, disk_csv_file, service_account_email_address, 
                  project_id, pem_file, data_center, auth_type, metadata_url, storage_directory, rootdir, auth_account, cycle_period=60, max_instances=23, restart=False, 
-                 commandFile = ""):
+                 commandFile = "", StackdriverAPIKey="", activateStackDriver=False):
         '''
         Constructor
         '''
@@ -73,6 +77,8 @@ class JobExecutionLoop(object):
         self.commandFile = commandFile
         self.rootdir=rootdir
         self.auth_account=auth_account
+        self.StackdriverAPIKey = StackdriverAPIKey
+        self.activateStackDriver = activateStackDriver
         
     def run(self):
         # get logfile reader
@@ -83,7 +89,7 @@ class JobExecutionLoop(object):
         
         # start job manager, which has some useful functions for checking on the status and starting jobs
         self.jobManager=JobManager(self.job_csv_file, self.disk_csv_file, self.myDriver, self.log, self.storage_directory, self.max_instances, 
-                                   self.rootdir, update= (not self.restart))
+                                   self.rootdir, update= (not self.restart), StackdriverAPIKey=self.StackdriverAPIKey, activateStackDriver=self.activateStackDriver)
 
         # hard restart if restart is true to remove previous instances and disks
         if self.restart: 
@@ -91,7 +97,7 @@ class JobExecutionLoop(object):
             self.jobManager.shutDown(wait=False)
             # need to reboot manager too so it knows the jobs are gone
             self.jobManager=JobManager(self.job_csv_file, self.disk_csv_file, self.myDriver, self.log, self.storage_directory, self.max_instances, 
-                                       self.rootdir)
+                                       self.rootdir, StackdriverAPIKey=self.StackdriverAPIKey, activateStackDriver=self.activateStackDriver)
 
         # run jobs
         while(self.jobManager.remainingJobs()):
@@ -113,7 +119,8 @@ if __name__ == '__main__':
                             options.serviceAccountEmail, options.projectID, options.pemFile, 
                             options.dataCenter, options.authType, options.metadataURL, 
                             options.storageDirectory, options.rootdir, options.authAccount, max_instances=int(options.maxInstances),
-                            restart=(options.hardRestart=='T'))
+                            restart=(options.hardRestart=='T'), StackdriverAPIKey=options.StackdriverAPIKey, 
+                            activateStackDriver=(options.activateStackDriver=="T"))
     engine.run()
     
   
