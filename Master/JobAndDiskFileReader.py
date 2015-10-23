@@ -176,12 +176,16 @@ class JobAndDiskFileReader(object):
                     newInstInfo['dependencies']=[]
                 # add new instance
 #                 print self.activateStackDriver
+                print self.rootdir
                 result[newInstInfo['name']]=Instance(newInstInfo['name'], node_params,
                                                      newInstInfo['dependencies'],
                                                      read_disks, read_write_disks, boot_disk, myDriver,
                                                      newInstInfo['script'], log, rootdir=self.rootdir, preemptible=("T" in newInstInfo['preemptible']), 
                                                      StackdriverAPIKey = self.StackdriverAPIKey,
                                                      activateStackDriver= (self.activateStackDriver==True))
+#                 name, node_params, depedencies, read_disks, read_write_disks, boot_disk, myDriver, script, log, 
+#                  rootdir="/home/cmelton/", scriptAsParam=True, preemptible=True, StackdriverAPIKey="",
+#                  activateStackDriver=False
         return result
     
     def readInJobInfo(self):
