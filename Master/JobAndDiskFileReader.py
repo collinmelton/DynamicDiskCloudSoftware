@@ -179,7 +179,7 @@ class JobAndDiskFileReader(object):
                 result[newInstInfo['name']]=Instance(newInstInfo['name'], node_params,
                                                      newInstInfo['dependencies'],
                                                      read_disks, read_write_disks, boot_disk, myDriver,
-                                                     newInstInfo['script'], log, self.rootdir, preemptible=("T" in newInstInfo['preemptible']), 
+                                                     newInstInfo['script'], log, rootdir=self.rootdir, preemptible=("T" in newInstInfo['preemptible']), 
                                                      StackdriverAPIKey = self.StackdriverAPIKey,
                                                      activateStackDriver= (self.activateStackDriver==True))
         return result
