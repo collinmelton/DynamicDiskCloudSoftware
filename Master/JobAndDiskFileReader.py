@@ -23,10 +23,10 @@ class JobAndDiskFileReader(object):
         self.disk_csv_file=disk_csv_file
         self.myDriver=myDriver
         self.log=log
-        self.rootdir=rootdir,
-        self.StackdriverAPIKey = StackdriverAPIKey,
+        self.rootdir=rootdir
+        self.StackdriverAPIKey = StackdriverAPIKey
         self.activateStackDriver= activateStackDriver
-        print "JobAndDiskFileReader", self.rootdir, self.StackdriverAPIKey, self.activateStackDriver 
+#         print "JobAndDiskFileReader", self.rootdir, self.StackdriverAPIKey, self.activateStackDriver 
     
     def trycommand(self, func, *args, **kwargs):
         retries = 10
