@@ -115,6 +115,8 @@ class JobExecutionLoop(object):
 
 if __name__ == '__main__':
     options = getOptions()
+    print options.rootdir
+    print options.activateStackDriver
     engine=JobExecutionLoop(options.logFilePath, options.InstancesFile, options.DisksFile,
                             options.serviceAccountEmail, options.projectID, options.pemFile, 
                             options.dataCenter, options.authType, options.metadataURL, 
