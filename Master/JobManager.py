@@ -19,6 +19,7 @@ class JobManager(object):
         self.disk_csv_file=disk_csv_file
         self.myDriver=myDriver
         self.log=log
+        print "JobManager", rootdir, StackdriverAPIKey, activateStackDriver
         jobInfoReader=JobAndDiskFileReader(job_csv_file, disk_csv_file, myDriver, log, rootdir, StackdriverAPIKey=StackdriverAPIKey, activateStackDriver=activateStackDriver)
         self.instances, self.disks = jobInfoReader.readInJobInfo()
         self.instanceManager=InstanceManager(myDriver, self.instances, storage_directory, log, rootdir)

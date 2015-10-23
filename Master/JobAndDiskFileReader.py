@@ -26,6 +26,7 @@ class JobAndDiskFileReader(object):
         self.rootdir=rootdir,
         self.StackdriverAPIKey = StackdriverAPIKey,
         self.activateStackDriver= activateStackDriver
+        print "JobAndDiskFileReader", self.rootdir, self.StackdriverAPIKey, self.activateStackDriver 
     
     def trycommand(self, func, *args, **kwargs):
         retries = 10
