@@ -105,11 +105,22 @@ class GCEManager(GCENodeDriver):
                 list_volumes = [self._to_storage_volume(d) for d in
                                 response['items']]
         return list_volumes
+
+    def localSSDData(self, location, numDisks=1):
+        return [{'kind': 'compute#attachedDisk',
+                'autodelete': True,
+                'type': 'SCRATCH',
+                'mode': 'READ_WRITE',
+                'boot': False,
+                "interface": "SCSI",
+                'deviceName': "local-ssd-"+str(i),
+                "initializeParams": {"diskType": "https://www.googleapis.com/compute/v1/projects/"+self.project+"/zones/"+location+"/diskTypes/local-ssd"}
+                } for i in range(min(numDisks, 4))]
     
     def create_node(self, name, size, image, location=None,ex_network='default', 
                     ex_tags=None, ex_metadata=None,ex_boot_disk=None, 
                     use_existing_disk=True, external_ip='ephemeral', serviceAccountScopes=None, additionalDisks=[],
-                    preemptible=False):
+                    preemptible=False, numLocalSSD=0):
         location = location or self.zone
         if not hasattr(location, 'name'):
             location = self.ex_get_zone(location)
@@ -134,6 +145,8 @@ class GCEManager(GCENodeDriver):
               "email": "default"}]
         for diskData in self._disksToDiskData(additionalDisks):
             node_data["disks"].append(diskData)
+        if numLocalSSD>0:
+            node_data["disks"]+=self.localSSDData(location)
         if preemptible:
             node_data["scheduling"]={'preemptible': True}
     
