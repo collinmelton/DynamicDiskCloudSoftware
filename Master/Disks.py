@@ -4,7 +4,7 @@ import sys, time
 
 
 class Disk:
-    def __init__(self, name, size, location, snapshot, myDriver, image, instanceNames, log, disk_type = 'pd-standard'):
+    def __init__(self, name, size, location, snapshot, myDriver, image, instanceNames, log, disk_type = 'pd-standard', init_source="", shutdown_dest=""):
         self.name=name
         self.size=size
         self.location=location
@@ -20,6 +20,8 @@ class Disk:
         self.printToLog("initialized disk class")
         self.formatted=False
         self.disk_type=disk_type
+        self.init_source = init_source
+        self.shutdown_dest = shutdown_dest
 
     def __str__(self):
         return self.name
@@ -27,12 +29,27 @@ class Disk:
     def __repr__(self):
         return self.name
 
+    # removes content that should not be on the disk (i.e. content saved to disk if a prior instance was shutdown prior to completing)
     def contentRestore(self, restoreProgramPath):
         return restoreProgramPath+ " --P /mnt/"+self.name +" --F /mnt/"+self.name+"/"+"disk.content"
 
+    # saves the directories and files stored on the disk 
     def contentSave(self, saveProgramPath):
         return saveProgramPath+ " --P /mnt/"+self.name +" --F /mnt/"+self.name+"/"+"disk.content"
 
+    # returns a script to initialize drive from some source (i.e. another disk or from a storage bucket)
+    def initialization_script(self):
+        if self.init_source != "":
+            return "gsutil rsync -r "+self.init_source+" /mnt/"+self.name
+        return ""
+    
+    # returns a script to save disk contents to dest directory
+    def shutdown_save_script(self):
+        if self.shutdown_dest != "":
+            return "gsutil rsync -r /mnt/"+self.name+" "+self.shutdown_dest
+        return ""
+
+    # returns a script for mounting the disk
     def mount_script(self, isWrite):
         result="mkdir -p /mnt/"+self.name
         if self.formatted:
@@ -42,10 +59,6 @@ class Disk:
                 result+="\nmount -o ro,noload /dev/disk/by-id/google-"+self.name+" /mnt/"+self.name+" -t ext4"
         else:
             result+="\n/usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' /dev/disk/by-id/google-"+self.name+" /mnt/"+self.name
-#         if isWrite:
-#             result+="\nchmod a+w /mnt/"+self.name
-#         else:
-#             result+="\nchmod a+r /mnt/"+self.name
         self.formatted=True
         return result
     

@@ -102,9 +102,12 @@ class JobAndDiskFileReader(object):
         # make disk instances
         result={}
         for newDiskInfo in newDiskInfos:
+            if 'init_source' not in newDiskInfo: newDiskInfo['init_source']=""
+            if "shutdown_dest" not in newDiskInfo: newDiskInfo["shutdown_dest"]=""
             result[newDiskInfo['name']]=Disk(newDiskInfo['name'], newDiskInfo['size'], 
                                                    newDiskInfo['location'], newDiskInfo['snapshot'], 
-                                                   myDriver, newDiskInfo['image'], [], log, disk_type = newDiskInfo['disk_type']) 
+                                                   myDriver, newDiskInfo['image'], [], log, disk_type = newDiskInfo['disk_type'],
+                                                   init_source=newDiskInfo['init_source'], shutdown_dest=newDiskInfo["shutdown_dest"]) 
         return result
     
     def readInstances(self, InstancesFile, myDriver, disks, log):
@@ -178,12 +181,18 @@ class JobAndDiskFileReader(object):
                 # add new instance
 #                 print self.activateStackDriver
                 print self.rootdir
+                if 'numLocalSSD' not in newInstInfo: newInstInfo['numLocalSSD'] = 0
+                else: newInstInfo['numLocalSSD'] = int(newInstInfo['numLocalSSD'])
+                if 'localSSDInitSources' not in newInstInfo: newInstInfo['localSSDInitSources'] = ""
+                if 'localSSDDests' not in newInstInfo: newInstInfo['localSSDDests'] = ""
                 result[newInstInfo['name']]=Instance(newInstInfo['name'], node_params,
                                                      newInstInfo['dependencies'],
                                                      read_disks, read_write_disks, boot_disk, myDriver,
                                                      newInstInfo['script'], log, rootdir=self.rootdir, preemptible=("T" in newInstInfo['preemptible']), 
                                                      StackdriverAPIKey = self.StackdriverAPIKey,
-                                                     activateStackDriver= (self.activateStackDriver==True))
+                                                     activateStackDriver= (self.activateStackDriver==True), numLocalSSD=newInstInfo['numLocalSSD'],
+                                                     localSSDInitSources = newInstInfo['localSSDInitSources'].split("|"),
+                                                     localSSDDests = newInstInfo['localSSDDests'.split("|")])
 #                 name, node_params, depedencies, read_disks, read_write_disks, boot_disk, myDriver, script, log, 
 #                  rootdir="/home/cmelton/", scriptAsParam=True, preemptible=True, StackdriverAPIKey="",
 #                  activateStackDriver=False

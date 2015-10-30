@@ -8,7 +8,7 @@ USERID="cmelton"
 class Instance:
     def __init__(self, name, node_params, depedencies, read_disks, read_write_disks, boot_disk, myDriver, script, log, 
                  rootdir="/home/cmelton/", scriptAsParam=True, preemptible=True, StackdriverAPIKey="",
-                 activateStackDriver=False):
+                 activateStackDriver=False, numLocalSSD=0, localSSDInitSources="", localSSDDests=""):
         self.name=name
         self.node_params=node_params
         self.dependencyNames=depedencies
@@ -29,7 +29,11 @@ class Instance:
         self.ssh_error_counter = 0
         self.preemptible = preemptible
         self.activateStackdriver = activateStackDriver
-        self.StackdriverAPIKey = StackdriverAPIKey 
+        self.StackdriverAPIKey = StackdriverAPIKey
+        self.numLocalSSD = numLocalSSD
+        self.localSSDInitSources = localSSDInitSources
+        self.localSSDDests = localSSDDests
+#         if self.numLocalSSD > 0: self.preemptible = False # no preemptible for local ssd for now
 
     def __str__(self):
         return self.name
@@ -151,15 +155,34 @@ class Instance:
 #         return("\n".join(map(lambda x: "\t"+str(x), [self.name, self.node_params, self.dependencyNames, self.read_disks, 
 #                                                 self.boot_disk, self.myDriver, self.created, self.destroyed, 
 #                                                 self.script, self.node, self.log, self.scriptAsParam, self.failed])))
-            
+    
+    # code to run to initialize read/write disks, will copy disks contents to disk from some source
+    def _initialize_disks(self):
+        result = "\n".join([d.initialization_script() for d in self.read_write_disks])
+        for i in range(min(self.numLocalSSD, len(self.localSSDInitSources))):
+            source = self.localSSDInitSources[i]
+            result += "\n"+"gsutil rsync -r "+source+" /mnt/lssd-"+str(i)
+
+    def _save_disk_content(self):
+        result = "\n".join([d.shutdown_save_script() for d in self.read_write_disks])
+        for i in range(min(self.numLocalSSD, len(self.localSSDDests))):
+            dest = self.localSSDDests[i]
+            result += "\n"+"gsutil rsync -r /mnt/lssd-"+str(i)+ " "+dest
+
+    def _mount_local_ssd(self):
+        return ["/usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' /dev/disk/by-id/google-local-ssd-"+str(i)+" /mnt/lssd-"+str(i) for i in range(self.numLocalSSD)]
+
+    # code to mount disks
     def _mountDisksScript(self):
         read_only=map(lambda disk: disk.mount_script(False), self.read_disks)
         read_write=map(lambda disk: disk.mount_script(True), self.read_write_disks)
+        local_ssd=self._mount_local_ssd()
         print self.rootdir
         read_write_disk_restore = map(lambda disk: disk.contentRestore("/usr/local/bin/python2.7 "+self.rootdir+"DynamicDiskCloudSoftware/Worker/restoreDiskContent.py"), self.read_write_disks)
-        result= "\n".join(read_only+read_write+read_write_disk_restore)
+        result= "\n".join(read_only+read_write+local_ssd+read_write_disk_restore)
         return result
     
+    # code to unmount disks
     def _unmountDisksScript(self):
         read_only=map(lambda disk: disk.unmount_script(), self.read_disks)
         read_write_save=map(lambda disk: disk.contentSave("/usr/local/bin/python2.7 "+self.rootdir+"DynamicDiskCloudSoftware/Worker/writeDiskContentFile.py"), self.read_write_disks)
@@ -174,7 +197,7 @@ class Instance:
     # the StartupWrapper.py program executes the script, saves the output to google cloud storage and updates the project meta data on start and completion
 
     def packageScript(self):
-        script = self._mountDisksScript()+"\n"+self._setActiveGcloudAuthAccount()+"\n"+self.script
+        script = self._mountDisksScript()+"\n"+self._setActiveGcloudAuthAccount()+"\n"+self._initialize_disks()+"\n"+self.script+"\n"+self._save_disk_content()
         shutdownscript = self._unmountDisksScript()
         result = "\n#! /bin/bash"
         if self.activateStackdriver: result += "\nsudo bash stack-install.sh --api-key="+self.StackdriverAPIKey
@@ -222,7 +245,7 @@ class Instance:
                 self.node=self.trycommand(self.myDriver.create_node, self.name, self.node_params["size"], self.node_params["image"], location=self.node_params["location"],
                                       ex_network=self.node_params["ex_network"], ex_tags=self.node_params["ex_tags"], ex_metadata=self.node_params["ex_metadata"], 
                                       ex_boot_disk=self.boot_disk.disk, serviceAccountScopes=["https://www.googleapis.com/auth/compute", "https://www.googleapis.com/auth/devstorage.read_write"], 
-                                      additionalDisks=additionalDisks, preemptible=self.preemptible)
+                                      additionalDisks=additionalDisks, preemptible=self.preemptible, numLocalSSD=self.numLocalSSD)
                 if self.node==None:
                     self.node=self.trycommand(self.myDriver.ex_get_node, self.name)
                 if i==2:
