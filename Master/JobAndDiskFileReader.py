@@ -192,7 +192,7 @@ class JobAndDiskFileReader(object):
                                                      StackdriverAPIKey = self.StackdriverAPIKey,
                                                      activateStackDriver= (self.activateStackDriver==True), numLocalSSD=newInstInfo['numLocalSSD'],
                                                      localSSDInitSources = newInstInfo['localSSDInitSources'].split("|"),
-                                                     localSSDDests = newInstInfo['localSSDDests'.split("|")])
+                                                     localSSDDests = newInstInfo['localSSDDests'].split("|"))
 #                 name, node_params, depedencies, read_disks, read_write_disks, boot_disk, myDriver, script, log, 
 #                  rootdir="/home/cmelton/", scriptAsParam=True, preemptible=True, StackdriverAPIKey="",
 #                  activateStackDriver=False
