@@ -162,12 +162,14 @@ class Instance:
         for i in range(min(self.numLocalSSD, len(self.localSSDInitSources))):
             source = self.localSSDInitSources[i]
             result += "\n"+"gsutil rsync -r "+source+" /mnt/lssd-"+str(i)
+        return result
 
     def _save_disk_content(self):
         result = "\n".join([d.shutdown_save_script() for d in self.read_write_disks])
         for i in range(min(self.numLocalSSD, len(self.localSSDDests))):
             dest = self.localSSDDests[i]
             result += "\n"+"gsutil rsync -r /mnt/lssd-"+str(i)+ " "+dest
+        return result
 
     def _mount_local_ssd(self):
         return ["/usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' /dev/disk/by-id/google-local-ssd-"+str(i)+" /mnt/lssd-"+str(i) for i in range(self.numLocalSSD)]
@@ -183,6 +185,7 @@ class Instance:
         return result
     
     # code to unmount disks
+    
     def _unmountDisksScript(self):
         read_only=map(lambda disk: disk.unmount_script(), self.read_disks)
         read_write_save=map(lambda disk: disk.contentSave("/usr/local/bin/python2.7 "+self.rootdir+"DynamicDiskCloudSoftware/Worker/writeDiskContentFile.py"), self.read_write_disks)
