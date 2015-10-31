@@ -6,6 +6,14 @@ Created on Jul 25, 2014
 from libcloud.compute.drivers.gce import GCENodeDriver
 import urllib
 
+from libcloud.common.google import GoogleBaseError
+class InvalidRequestError(GoogleBaseError):
+    def __init__(self, value, http_code, code, driver=None):
+        super(InvalidRequestError, self).__init__(value, http_code, driver)
+        
+    def __repr__(self):
+        return str(self.http_code)+": "+str(self.value)
+
 class GCEManager(GCENodeDriver):
     '''
     This class is a subclass of GCENodeDriver with the added functionality of allowing
@@ -119,6 +127,8 @@ class GCEManager(GCENodeDriver):
                 "initializeParams": {"diskType": "https://www.googleapis.com/compute/v1/projects/gbsc-gcp-lab-snyder/zones/us-central1-a/diskTypes/local-ssd"}
 #"https://www.googleapis.com/compute/v1/projects/"+self.project+"/zones/"+location+"/diskTypes/local-ssd"}
                 } for i in range(min(numDisks, 4))]
+    
+    
     
     def create_node(self, name, size, image, location=None,ex_network='default', 
                     ex_tags=None, ex_metadata=None,ex_boot_disk=None, 
