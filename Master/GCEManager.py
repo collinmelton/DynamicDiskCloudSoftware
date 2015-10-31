@@ -10,7 +10,10 @@ from libcloud.common.google import GoogleBaseError
 class InvalidRequestError(GoogleBaseError):
     def __init__(self, value, http_code, code, driver=None):
         super(InvalidRequestError, self).__init__(value, http_code, driver)
-        
+    
+    def __str__(self):
+        return self.__repr__()
+    
     def __repr__(self):
         return str(self.http_code)+": "+str(self.value)
 
