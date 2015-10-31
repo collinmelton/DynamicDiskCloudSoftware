@@ -114,7 +114,7 @@ class GCEManager(GCENodeDriver):
                 'mode': 'READ_WRITE',
                 'boot': False,
                 "interface": "SCSI",
-                'name': "local-ssd-"+str(i),
+#                 'name': "local-ssd-"+str(i),
                 'deviceName': "local-ssd-"+str(i),
                 "initializeParams": {"diskType": "https://www.googleapis.com/compute/v1/projects/gbsc-gcp-lab-snyder/zones/us-central1-a/diskTypes/local-ssd"}
 #"https://www.googleapis.com/compute/v1/projects/"+self.project+"/zones/"+location+"/diskTypes/local-ssd"}
