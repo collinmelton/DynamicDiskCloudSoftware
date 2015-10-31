@@ -109,12 +109,13 @@ class GCEManager(GCENodeDriver):
     def localSSDData(self, location, numDisks=1):
         return [{#'kind': 'compute#attachedDisk',
                 'autodelete': True,
-                'type': 'local-ssd',
-                #'mode': 'READ_WRITE',
-                #'boot': False,
+                'type': 'SCRATCH', #'local-ssd',
+                'mode': 'READ_WRITE',
+                'boot': False,
                 "interface": "SCSI",
-                'name': "local-ssd-"+str(i)#,
-                #"initializeParams": {"diskType": "https://www.googleapis.com/compute/v1/projects/"+self.project+"/zones/"+location+"/diskTypes/local-ssd"}
+                'name': "local-ssd-"+str(i),
+                'deviceName': "local-ssd-"+str(i),
+                "initializeParams": {"diskType": "https://www.googleapis.com/compute/v1/projects/"+self.project+"/zones/"+location+"/diskTypes/local-ssd"}
                 } for i in range(min(numDisks, 4))]
     
     def create_node(self, name, size, image, location=None,ex_network='default', 
