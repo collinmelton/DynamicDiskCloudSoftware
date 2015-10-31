@@ -109,7 +109,8 @@ class GCEManager(GCENodeDriver):
     def localSSDData(self, location, numDisks=1):
         return [{#'kind': 'compute#attachedDisk',
                 'autodelete': True,
-                'type': 'SCRATCH', #'local-ssd',
+                #'type': 'SCRATCH', #'local-ssd',
+                'type': 'local-ssd',
                 'mode': 'READ_WRITE',
                 'boot': False,
                 "interface": "SCSI",
