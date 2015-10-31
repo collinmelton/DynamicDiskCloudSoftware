@@ -20,9 +20,9 @@ class GCEManager(GCENodeDriver):
     def _diskToDiskData(self, Disk):
         return {'kind': 'compute#attachedDisk',
                 'boot': False,
-                'type': 'PERSISTENT',
-                'mode': Disk.mode,
-                'deviceName': Disk.disk.name,
+                'type': 'pd-standard',
+                #'mode': Disk.mode,
+                'name': Disk.disk.name,
                 'zone': Disk.disk.extra['zone'].extra['selfLink'],
                 'source': Disk.disk.extra['selfLink']}
     
@@ -107,14 +107,14 @@ class GCEManager(GCENodeDriver):
         return list_volumes
 
     def localSSDData(self, location, numDisks=1):
-        return [{'kind': 'compute#attachedDisk',
+        return [{#'kind': 'compute#attachedDisk',
                 'autodelete': True,
-                'type': 'SCRATCH',
-                'mode': 'READ_WRITE',
-                'boot': False,
+                'type': 'local-ssd',
+                #'mode': 'READ_WRITE',
+                #'boot': False,
                 "interface": "SCSI",
-                'deviceName': "local-ssd-"+str(i),
-                "initializeParams": {"diskType": "https://www.googleapis.com/compute/v1/projects/"+self.project+"/zones/"+location+"/diskTypes/local-ssd"}
+                'name': "local-ssd-"+str(i)#,
+                #"initializeParams": {"diskType": "https://www.googleapis.com/compute/v1/projects/"+self.project+"/zones/"+location+"/diskTypes/local-ssd"}
                 } for i in range(min(numDisks, 4))]
     
     def create_node(self, name, size, image, location=None,ex_network='default', 
