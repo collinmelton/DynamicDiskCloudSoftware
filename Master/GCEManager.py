@@ -6,16 +6,16 @@ Created on Jul 25, 2014
 from libcloud.compute.drivers.gce import GCENodeDriver
 import urllib
 
-from libcloud.common.google import GoogleBaseError
-class InvalidRequestError(GoogleBaseError):
-    def __init__(self, value, http_code, code, driver=None):
-        super(InvalidRequestError, self).__init__(value, http_code, driver)
-    
-    def __str__(self):
-        return self.__repr__()
-    
-    def __repr__(self):
-        return str(self.http_code)+": "+str(self.value)
+# from libcloud.common.google import GoogleBaseError
+# class InvalidRequestError(GoogleBaseError):
+#     def __init__(self, value, http_code, code, driver=None):
+#         super(InvalidRequestError, self).__init__(value, http_code, driver)
+#     
+#     def __str__(self):
+#         return self.__repr__()
+#     
+#     def __repr__(self):
+#         return str(self.http_code)+": "+str(self.value)
 
 class GCEManager(GCENodeDriver):
     '''
@@ -122,8 +122,8 @@ class GCEManager(GCENodeDriver):
                 'autodelete': True,
                 'type': 'SCRATCH', #'local-ssd',
 #                 'type': 'local-ssd',
-                'mode': 'READ_WRITE',
-                'boot': False,
+#                 'mode': 'READ_WRITE',
+#                 'boot': False,
                 "interface": "SCSI",
 #                 'name': "local-ssd-"+str(i),
                 'deviceName': "local-ssd-"+str(i),
