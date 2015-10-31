@@ -116,7 +116,8 @@ class GCEManager(GCENodeDriver):
                 "interface": "SCSI",
                 'name': "local-ssd-"+str(i),
                 'deviceName': "local-ssd-"+str(i),
-                #"initializeParams": {"diskType": "https://www.googleapis.com/compute/v1/projects/"+self.project+"/zones/"+location+"/diskTypes/local-ssd"}
+                "initializeParams": {"diskType": "https://www.googleapis.com/compute/v1/projects/gbsc-gcp-lab-snyder/zones/us-central1-a/diskTypes/local-ssd"}
+#"https://www.googleapis.com/compute/v1/projects/"+self.project+"/zones/"+location+"/diskTypes/local-ssd"}
                 } for i in range(min(numDisks, 4))]
     
     def create_node(self, name, size, image, location=None,ex_network='default', 
