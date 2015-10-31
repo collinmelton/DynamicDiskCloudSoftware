@@ -21,7 +21,7 @@ class GCEManager(GCENodeDriver):
         return {'kind': 'compute#attachedDisk',
                 'boot': False,
                 'type': 'pd-standard',
-                #'mode': Disk.mode,
+                'mode': Disk.mode,
                 'name': Disk.disk.name,
                 'zone': Disk.disk.extra['zone'].extra['selfLink'],
                 'source': Disk.disk.extra['selfLink']}
@@ -155,8 +155,8 @@ class GCEManager(GCENodeDriver):
         if log != None:
             log.write("request: "+str(request))
             log.write("node data: "+str(node_data))
-        print "request", request
-        print "node data", str(node_data)
+#         print "request", request
+#         print "node data", str(node_data)
         self.connection.async_request(request, method='POST', data=node_data)
 
         return self.ex_get_node(name, location.name)
