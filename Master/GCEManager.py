@@ -118,17 +118,20 @@ class GCEManager(GCENodeDriver):
         return list_volumes
 
     def localSSDData(self, location, numDisks=1):
-        return []
+#         disk_type_local_ssd = 
         return [{#'kind': 'compute#attachedDisk',
-                'autodelete': True,
-                'type': 'SCRATCH', #'local-ssd',
+                "autodelete": True,
+                "type": "SCRATCH", #'local-ssd',
 #                 'type': 'local-ssd',
 #                 'mode': 'READ_WRITE',
 #                 'boot': False,
                 "interface": "SCSI",
 #                 'name': "local-ssd-"+str(i),
-                'deviceName': "local-ssd-"+str(i),
-                "initializeParams": {"diskType": "https://www.googleapis.com/compute/v1/projects/gbsc-gcp-lab-snyder/zones/us-central1-a/diskTypes/local-ssd"}
+#                 "deviceName": "local-ssd-"+str(i),
+                "initializeParams": {
+                                     "diskType": self.ex_get_disktype('local-ssd', zone=location).extra['selfLink']
+                                     }
+#                 "initializeParams": self.ex_get_disktype('local-ssd', zone=location).extra['selfLink'] #{"diskType": "https://www.googleapis.com/compute/v1/projects/gbsc-gcp-lab-snyder/zones/us-central1-a/diskTypes/local-ssd"}
 #"https://www.googleapis.com/compute/v1/projects/"+self.project+"/zones/"+location+"/diskTypes/local-ssd"}
                 } for i in range(min(numDisks, 4))]
     
