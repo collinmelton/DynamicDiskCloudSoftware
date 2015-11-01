@@ -118,7 +118,7 @@ class GCEManager(GCENodeDriver):
         return list_volumes
 
     def localSSDData(self, location, numDisks=1):
-        return [{}]
+        return []
         return [{#'kind': 'compute#attachedDisk',
                 'autodelete': True,
                 'type': 'SCRATCH', #'local-ssd',
