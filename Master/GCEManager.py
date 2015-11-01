@@ -133,7 +133,7 @@ class GCEManager(GCENodeDriver):
                 "initializeParams": {
                                      "diskType": self.ex_get_disktype('local-ssd', zone=location).extra['selfLink']
                                      },
-                 "autodelete": True
+                 "autoDelete": True
 #                 "initializeParams": self.ex_get_disktype('local-ssd', zone=location).extra['selfLink'] #{"diskType": "https://www.googleapis.com/compute/v1/projects/gbsc-gcp-lab-snyder/zones/us-central1-a/diskTypes/local-ssd"}
 #"https://www.googleapis.com/compute/v1/projects/"+self.project+"/zones/"+location+"/diskTypes/local-ssd"}
                 } for i in range(min(numDisks, 4))]
