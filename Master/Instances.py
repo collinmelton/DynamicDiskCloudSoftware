@@ -169,7 +169,8 @@ class Instance:
         result = "\n".join([d.shutdown_save_script() for d in self.read_write_disks])
         for i in range(min(self.numLocalSSD, len(self.localSSDDests))):
             dest = self.localSSDDests[i]
-            result += "\n"+"gsutil rsync -r /mnt/lssd-"+str(i)+ " "+dest
+            if dest != "":
+                result += "\n"+"gsutil rsync -r /mnt/lssd-"+str(i)+ " "+dest
         return result
 
     def _mount_local_ssd(self):
