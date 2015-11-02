@@ -29,13 +29,25 @@ def readContentFile(diskContentFilename, verbose):
     return content
 
 def restoreContent(currentContent, previousContent, verbose):
+    # remove files first
     for c in currentContent:
-        if c not in previousContent:
-            if c[-1]=="/": os.rmdir(c) #will remove an empty directory.
-            else: os.remove(c) #will remove a file.
-            if verbose: print "removed", c
-        else:
-            if verbose: print "kept", c
+        # check if c is a file
+        if c[-1]!="/":
+            if c not in previousContent: 
+                os.remove(c) #will remove a file.
+                if verbose: print "removed", c
+            else:
+                if verbose: print "kept", c
+    # now remove directories
+    for c in currentContent:
+        # check if c is a directory
+        if c[-1]=="/":
+            if c not in previousContent: 
+                os.rmdir(c) #will remove an empty directory.
+                if verbose: print "removed", c
+            else:
+                if verbose: print "kept", c
+
 
 if __name__ == '__main__':
     options=getOptions()
