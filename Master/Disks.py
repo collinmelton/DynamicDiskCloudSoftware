@@ -30,26 +30,31 @@ class Disk:
         return self.name
 
     # removes content that should not be on the disk (i.e. content saved to disk if a prior instance was shutdown prior to completing)
+
     def contentRestore(self, restoreProgramPath):
         return restoreProgramPath+ " --P /mnt/"+self.name +" --F /mnt/"+self.name+"/"+"disk.content"
 
     # saves the directories and files stored on the disk 
+
     def contentSave(self, saveProgramPath):
         return saveProgramPath+ " --P /mnt/"+self.name +" --F /mnt/"+self.name+"/"+"disk.content"
 
     # returns a script to initialize drive from some source (i.e. another disk or from a storage bucket)
+
     def initialization_script(self):
         if self.init_source != "":
             return "gsutil rsync -r "+self.init_source+" /mnt/"+self.name
         return ""
     
     # returns a script to save disk contents to dest directory
+    
     def shutdown_save_script(self):
         if self.shutdown_dest != "":
             return "gsutil rsync -r /mnt/"+self.name+" "+self.shutdown_dest
         return ""
 
     # returns a script for mounting the disk
+    
     def mount_script(self, isWrite):
         result="mkdir -p /mnt/"+self.name
         if self.formatted:
@@ -73,7 +78,6 @@ class Disk:
                 self.created=True
                 self.formatted=True
         
-
     def tabDelimSummary(self):
         return {"header":"\t".join(["name", "size", "location", "snapshot", "image", 
                                     "myDriver", "created", "destroyed", "disk", "instanceNames", "log"]), 

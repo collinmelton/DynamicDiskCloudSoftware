@@ -31,7 +31,7 @@ class GCEManager(GCENodeDriver):
     def _diskToDiskData(self, Disk):
         return {'kind': 'compute#attachedDisk',
                 'boot': False,
-                'type': 'pd-standard',
+                'type': 'PERSISTENT', #'pd-standard',
                 'mode': Disk.mode,
                 'name': Disk.disk.name,
                 'zone': Disk.disk.extra['zone'].extra['selfLink'],
