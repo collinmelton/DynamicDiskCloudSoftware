@@ -172,8 +172,8 @@ class Instance:
         return result
 
     def _mount_local_ssd(self):
-        return ["/usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' /dev/disk/by-id/google-local-ssd-"+str(i)+" /mnt/lssd-"+str(i) for i in range(self.numLocalSSD)]
-
+        return ["/usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' /dev/disk/by-id/scsi-"+str(i)+"Google_EphemeralDisk_local-ssd-"+str(i)+" /mnt/lssd-"+str(i) for i in range(self.numLocalSSD)]
+    
     # code to mount disks
     def _mountDisksScript(self):
         read_only=map(lambda disk: disk.mount_script(False), self.read_disks)
