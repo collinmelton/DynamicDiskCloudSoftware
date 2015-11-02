@@ -33,7 +33,8 @@ class GCEManager(GCENodeDriver):
                 'boot': False,
                 'type': 'PERSISTENT', #'pd-standard',
                 'mode': Disk.mode,
-                'name': Disk.disk.name,
+                'deviceName': Disk.disk.name,
+                'autoDelete': False,
                 'zone': Disk.disk.extra['zone'].extra['selfLink'],
                 'source': Disk.disk.extra['selfLink']}
     
