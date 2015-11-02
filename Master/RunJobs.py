@@ -110,7 +110,7 @@ class JobExecutionLoop(object):
         self.jobManager.writeInstanceSummary()
         
         # clean up
-#         self.jobManager.shutDown()
+        self.jobManager.shutDown()
   
 
 if __name__ == '__main__':
