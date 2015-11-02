@@ -166,7 +166,10 @@ class Instance:
         return result
 
     def _save_disk_content(self):
-        result = "\n".join([d.shutdown_save_script() for d in self.read_write_disks])
+        # save disk content
+        result="\n".join(map(lambda disk: disk.contentSave("/usr/local/bin/python2.7 "+self.rootdir+"DynamicDiskCloudSoftware/Worker/writeDiskContentFile.py"), self.read_write_disks))
+        # save disk files to other location (e.g. cloud storage)
+        result += "\n".join([d.shutdown_save_script() for d in self.read_write_disks])
         for i in range(min(self.numLocalSSD, len(self.localSSDDests))):
             dest = self.localSSDDests[i]
             if dest != "":
@@ -190,9 +193,8 @@ class Instance:
     
     def _unmountDisksScript(self):
         read_only=map(lambda disk: disk.unmount_script(), self.read_disks)
-        read_write_save=map(lambda disk: disk.contentSave("/usr/local/bin/python2.7 "+self.rootdir+"DynamicDiskCloudSoftware/Worker/writeDiskContentFile.py"), self.read_write_disks)
         read_write=map(lambda disk: disk.unmount_script(), self.read_write_disks)
-        result= "\n".join(read_write_save+read_only+read_write)
+        result= "\n".join(read_only+read_write)
         return result
     
     def _setActiveGcloudAuthAccount(self):
