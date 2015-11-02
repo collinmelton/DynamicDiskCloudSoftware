@@ -161,7 +161,8 @@ class Instance:
         result = "\n".join([d.initialization_script() for d in self.read_write_disks])
         for i in range(min(self.numLocalSSD, len(self.localSSDInitSources))):
             source = self.localSSDInitSources[i]
-            result += "\n"+"gsutil rsync -r "+source+" /mnt/lssd-"+str(i)
+            if source != "":
+                result += "\n"+"gsutil rsync -r "+source+" /mnt/lssd-"+str(i)
         return result
 
     def _save_disk_content(self):
