@@ -6,7 +6,7 @@ import datetime, psutil, os, subprocess, thread, pickle
 
 # certain text output for GATK can indicate that the command didn't actually fail even with non zero exit status 
 NOT_ACTUALLY_FAILED_LIST=["org.broadinstitute.sting.gatk.CommandLineExecutable.generateGATKRunReport", "org.broadinstitute.gatk.engine.CommandLineExecutable.generateGATKRunReport"]
-
+ 
 # get the current time
 def whatTimeIsIt():
     return datetime.datetime.now()
