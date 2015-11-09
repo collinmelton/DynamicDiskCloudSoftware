@@ -53,11 +53,11 @@ class Performance(object):
     '''
     This class represents a class that sores performance data for a specific moment in time.
     '''
-    def __init__(self):
+    def __init__(self, touse = []):
         import psutil
         # get process data
         self.time = whatTimeIsIt()
-        processes = [psutil.Process(pid) for pid in psutil.pids()]
+        processes = [psutil.Process(pid) for pid in psutil.pids() if pid in touse]
         self.processes = []
         for process in processes:
             try: self.processes.append(ProcessPerformance(process))
@@ -96,6 +96,14 @@ class PerformanceData(object):
     '''
     def __init__(self):
         self.performanceLog=[]
+        import psutil 
+        self.processes_to_use = []
+        for pid in psutil.pids():
+            try: 
+                p = psutil.Process(pid)
+                if "Startup.py" in " ".join(p.cmdline()): self.processes_to_use.append(pid)
+            except:
+                pass
     
     def to_tsv(self, identifier, include_header, byprocess=True):
         header=["identifier"]+self.performanceLog[0].header(byprocess=byprocess)
@@ -104,7 +112,7 @@ class PerformanceData(object):
         return result
         
     def update(self):
-        self.performanceLog.append(Performance())
+        self.performanceLog.append(Performance(touse = self.processes_to_use))
             
     def maxCPU(self):
         maxval=0
