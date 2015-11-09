@@ -16,7 +16,7 @@ import InstanceEngine
 def getOptions():
     parser = OptionParser()
     parser.add_option("--S", dest = "ScriptFile", help = "this should be a text form of a startup script, commands to run separated by '/n'",
-                      metavar = "STRING", type = "string", default = "echo hello")
+                      metavar = "STRING", type = "string", default = "echo hello\nsleep 5\necho 'done sleeping'")
     parser.add_option("--H", dest = "HistoryFile", help = "sets location of commands history file",
                       metavar = "STRING", type = "string", default = "./StartupCommandHistory.pickle")
     parser.add_option("--N", dest = "name", help = "sets name of instance",
