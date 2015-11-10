@@ -4,31 +4,90 @@ import datetime, psutil, os, subprocess, thread, pickle
 # return (now, {"cpu":psutil.cpu_percent(), "memory":psutil.virtual_memory().percent})
 # current_time.isoformat()
 
+# certain text output for GATK can indicate that the command didn't actually fail even with non zero exit status 
+NOT_ACTUALLY_FAILED_LIST=["org.broadinstitute.sting.gatk.CommandLineExecutable.generateGATKRunReport", "org.broadinstitute.gatk.engine.CommandLineExecutable.generateGATKRunReport"]
+ 
 # get the current time
 def whatTimeIsIt():
-    return datetime.datetime.now().time()
-
-def timedif(a, b):
-    '''returns dif a-b in hours'''
-    dif = (a.hour+a.minute/60.+a.second/3600.)-(b.hour+b.minute/60.+b.second/3600.)
-    if dif < 0: dif = dif + 24
-    return dif
+    return datetime.datetime.now()
    
-    # class to store instance performance data at a particular time
+class ProcessPerformance(object):
+    '''
+    This class represents a class that stores performance data for a specific process at a specific moment in time.
+    '''
+    def __init__(self, process):
+        self.name = process.name()
+        self.id = process.pid
+        self.properties = {}
+        # add io counters
+        try: self.addToDict(process.io_counters().__dict__)
+        except: pass
+        # add memory 
+        try: self.addToDict(process.memory_info().__dict__)
+        except: pass
+        # add cpu and some other data
+        self.addToDict({"pid": self.id,
+                        "name": self.name,
+                        "user": process.username(),
+                        "cpu percent": process.cpu_percent(interval=0.1), 
+                        "memory percent": process.memory_percent()})
+        try: self.addToDict({"command": " ".join(process.cmdline())})
+        except: pass
+
+    def addToDict(self, dict):
+        for k,v in dict.items():
+            self.properties[k] = str(v)
+    
+    def header(self):
+        return ["time"]+self.properties.keys()
+    
+    def tsv(self, time, header):
+        result = [str(time)]
+        for key in [k for k in header if k!="time"]:
+            if key in self.properties: result.append(str(self.properties[key]))
+            else: result.append("")
+        return result
+        
+# class to store instance performance data at a particular time
 class Performance(object):
     '''
     This class represents a class that sores performance data for a specific moment in time.
     '''
-    def __init__(self, time, cpu, memory):
-        self.time=time
-        self.cpu=cpu
-        self.memory=memory
+    def __init__(self, toexclude = []):
+        import psutil
+        # get process data
+        self.time = whatTimeIsIt()
+        processes = [psutil.Process(pid) for pid in psutil.pids() if pid not in toexclude]
+        self.processes = []
+        for process in processes:
+            try: self.processes.append(ProcessPerformance(process))
+            except: pass
+        # initialize data
+        iodata=psutil.disk_io_counters()
+        self.cpu = psutil.cpu_percent()
+        self.memory = psutil.virtual_memory().percent
+        self.read_count=iodata.__dict__["read_count"] # read_count: number of reads
+        self.write_count=iodata.__dict__["write_count"] # write_count: number of writes
+        self.read_bytes=iodata.__dict__["read_bytes"] # read_bytes: number of bytes read
+        self.write_bytes=iodata.__dict__["write_bytes"] # write_bytes: number of bytes written
+        self.read_time=iodata.__dict__["read_time"] # read_time: time spent reading from disk (in milliseconds)
+        self.write_time=iodata.__dict__["write_time"] # write_time: time spent writing to disk (in milliseconds)
         
-    def header(self):
-        return ["time", "cpu", "memory"]
+    def header(self, byprocess = False):
+        if not byprocess:
+            if self.read_count!=None:
+                return ["time", "cpu", "memory", "read_count", "write_count", "read_bytes", "write_bytes", "read_time", "write_time"]
+            return ["time", "cpu", "memory"]
+        else:
+            return self.processes[0].header()
     
-    def tsv(self):
-        return map(str, [self.time, self.cpu, self.memory])
+    def tsv(self, byprocess = False, header = []):
+        if not byprocess:
+            if self.read_count!=None:
+                return map(str, [self.time, self.cpu, self.memory, self.read_count, self.write_count, self.read_bytes, self.write_bytes, self.read_time, self.write_time])
+            return map(str, [self.time, self.cpu, self.memory])
+        else: 
+            return [p.tsv(self.time, header) for p in self.processes]
 
 # class to store instance performance data for all times
 class PerformanceData(object):
@@ -37,52 +96,30 @@ class PerformanceData(object):
     '''
     def __init__(self):
         self.performanceLog=[]
+        import psutil 
+        self.processes_to_exclude = []
+        for pid in psutil.pids():
+            try: 
+                p = psutil.Process(pid)
+                if "Startup.py" not in " ".join(p.cmdline()): self.processes_to_exclude.append(pid)
+            except:
+                self.processes_to_exclude.append(pid)
     
-    def to_tsv(self, identifier, include_header):
-        header=["identifier"]+self.performanceLog[0].header()
-        result= map(lambda p: [identifier]+p.tsv(), self.performanceLog)
+    def to_tsv(self, identifier, include_header, byprocess=True):
+        header=["identifier"]+self.performanceLog[0].header(byprocess=byprocess)
+        result= map(lambda p: [identifier]+p.tsv(byprocess=byprocess, header=header), self.performanceLog)
         if include_header: return [header]+result
         return result
         
     def update(self):
-        now = whatTimeIsIt()
-        cpu = psutil.cpu_percent()
-        memory = psutil.virtual_memory().percent
-        self.performanceLog.append(Performance(now, cpu, memory))
-
-    def totalTime(self):
-        times=map(lambda x: x.time, self.performanceLog)
-        if len(times)==0: return 0
-        difs = [timedif(times[i+1], times[i]) for i in range(len(times)-1)]
-#         print difs
-#         print sum(difs)
-        return round(sum(difs), 3)
-        
+        self.performanceLog.append(Performance(toexclude = self.processes_to_exclude))
             
-
     def maxCPU(self):
         maxval=0
         for p in self.performanceLog:
             maxval=max(maxval, p.cpu)
         return maxval
-    
-    def median(self, mylist):
-        sorts = sorted(mylist)
-        length = len(sorts)
-#         print sorts
-        if not length % 2: return (sorts[length / 2] + sorts[length / 2 - 1]) / 2.0
-        return sorts[length / 2]
-        
-    def medCPU(self):
-        cpus=map(lambda x: x.cpu, self.performanceLog)
-        if len(cpus)<1: return 0
-        return self.median(cpus)
-    
-    def medMem(self):
-        mems=map(lambda x: x.memory, self.performanceLog)
-        if len(mems)<1: return 0
-        return self.median(mems)
-    
+
     def maxMem(self):
         maxval=0
         for p in self.performanceLog:
@@ -91,6 +128,30 @@ class PerformanceData(object):
     
     def summary(self):
         return "max_cpu: "+str(self.maxCPU())+", max_mem: "+str(self.maxMem())
+    
+    def writeSummary(self, filename, byprocess=True):
+        f=open(filename, 'w')
+        previous=None
+        header = []
+        for log in self.performanceLog: 
+            if byprocess: 
+                if header == []: 
+                    header=log.header(byprocess=byprocess)
+                    f.write("\t".join(header))
+                result= "\n".join(["\t".join(row) for row in log.tsv(byprocess=byprocess, header=header)])
+                f.write("\n"+result)
+            else:
+                if previous==None:
+                    header=log.header()+["write_speed", "read_speed"]
+                    f.write("\t".join(header))
+                    writespeed=0
+                    readspeed=0
+                else:
+                    writespeed=(log.write_bytes-previous.write_bytes)/1000000/((log.time-previous.time).total_seconds())
+                    readspeed=(log.read_bytes-previous.read_bytes)/1000000/((log.time-previous.time).total_seconds())
+                f.write("\n"+"\t".join(log.tsv()+map(str, [writespeed, readspeed])))
+                previous=log
+        f.close()
 
 # class to store individual commands and run them
 class Command():
@@ -105,6 +166,12 @@ class Command():
         self.result="not run yet"
         self.failed=False
     
+    def getStatus(self):
+        if self.finished: 
+            if self.failed: return "failed"
+            else: return "complete"
+        else: return "not finished"  
+    
     def header(self):
         return ["start_time", "end_time", "command", "result", "finished", "failed"]
     
@@ -112,16 +179,18 @@ class Command():
         description = {"Start": ("string", "Start Time"),
                        "Stop": ("string", "End Time"),
                        "Finished": ("boolean", "Finished"),
-                       "Failed": ("boolean", "Failed"),
-                        "Command": ("string", "Command"),
-                        "Result": ("string", "Result")
+                       "Failed": ("boolean", "Failed")
+#                        ,
+#                        "Command": ("string", "Command"),
+#                        "Result": ("string", "Result")
                        }
         result= {"Start": str(self.start_time),
                  "Stop": str(self.end_time),
                  "Finished": self.finished,
-                 "Failed": self.failed,
-                "Command": self.command,
-                "Result": self.result
+                 "Failed": self.failed
+#                  ,
+#                  "Command": self.command,
+#                  "Result": self.result
                  }
         return (description, result)
     
@@ -152,7 +221,13 @@ class Command():
             except subprocess.CalledProcessError as e:
                 result = "\n".join(map(str, [e.cmd, e.returncode, e.output]))
                 print "failed"
-                self.failed=True
+                notfailed=False
+                self.failed = True
+                for item in NOT_ACTUALLY_FAILED_LIST:
+                    if item in result or item in e.output:
+                        notfailed=True
+                if notfailed:
+                    self.failed=False
             self.lock.acquire()
             self.result=result
             self.end_time=whatTimeIsIt()
@@ -227,7 +302,6 @@ class InstanceData(object):
         self.InstanceHistoryFile=InstanceHistoryFile
         if os.path.exists(self.InstanceHistoryFile):
             f=open(self.InstanceHistoryFile, 'r')
-#             print f
             savedData=pickle.load(f)
             f.close()
             self.run_performance_data=savedData["PerformanceData"]
@@ -262,6 +336,9 @@ class InstanceData(object):
         result+="\n"+self.command_data.summary()
         return result
     
+    def writeSummaryToFile(self, filename):
+        self.run_performance_data.writeSummary(filename)
+    
     def finished(self):
         if self.status()=="complete" or self.status()=="failed": return True
         return False
@@ -269,8 +346,19 @@ class InstanceData(object):
     def failed(self):
         self.command_data.status="failed"
         self.save()
+
+    
+    def getStatus(self):
+        if self.finished: 
+            if self.failed: return "failed"
+            else: return "complete"
+        else: return "not finished"  
     
     def update_status(self):
+#         statuses = [c.getStatus() for c in self.command_data.commands]
+#         if "failed" in statuses: return "failed"
+#         if "not finished" in statuses: return "started"
+#         return "complete"
         last_command=self.command_data.commands[self.command_data.currentCommand-1]
         if last_command.failed: self.command_data.status="failed"
         if last_command.finished and not last_command.failed and self.command_data.currentCommand>=len(self.command_data.commands):
