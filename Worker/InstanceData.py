@@ -57,10 +57,11 @@ class Performance(object):
         import psutil
         # get process data
         self.time = whatTimeIsIt()
-        processes = [psutil.Process(pid) for pid in psutil.pids() if pid not in toexclude]
         self.processes = []
-        for process in processes:
-            try: self.processes.append(ProcessPerformance(process))
+        for pid in [pid for pid in psutil.pids() if pid not in toexclude]:
+            try: 
+                process = psutil.Process(pid)
+                self.processes.append(ProcessPerformance(process))
             except: pass
         # initialize data
         iodata=psutil.disk_io_counters()
