@@ -13,7 +13,7 @@ def whatTimeIsIt():
    
 class ProcessPerformance(object):
     '''
-    This class represents a class that sores performance data for a specific process at a specific moment in time.
+    This class represents a class that stores performance data for a specific process at a specific moment in time.
     '''
     def __init__(self, process):
         self.name = process.name()
@@ -29,7 +29,7 @@ class ProcessPerformance(object):
         self.addToDict({"pid": self.id,
                         "name": self.name,
                         "user": process.username(),
-                        "cpu percent": process.cpu_percent(), 
+                        "cpu percent": process.cpu_percent(interval=0.1), 
                         "memory percent": process.memory_percent()})
         try: self.addToDict({"command": " ".join(process.cmdline())})
         except: pass
