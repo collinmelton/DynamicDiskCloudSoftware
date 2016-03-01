@@ -6,7 +6,7 @@ This software is designed to run genomics workflows on the Google Compute Engine
 - [Configure GCE Image](#configure-gce-image)
 - [Get Service Account Authentication Info](#get-service-account-authentication-info) 
 - [Run Test](#run-test) 
-- [Web Server Version](#web-server)
+- [Web Server Version](#web-server-version)
 
 # Get Setup with GCE
 Get a GCE Account and setup a Google Cloud Storage bucket. URI should look something like this gs://bucketname/
