@@ -236,7 +236,7 @@ class Instance:
                 if self.scriptAsParam:
                     self.node_params["ex_metadata"]["items"].append({"key":"startup-script", "value":self.packageScript()})
                 else:
-                    raise Exception("deploy with script form file or cloud storage not implemented yet")
+                    raise Exception("deploy with script from file or cloud storage not implemented yet")
 #             print self.node_params["ex_metadata"]
             # change mode of disks and prepare them in a list for node creation
             for disk in self.read_disks:

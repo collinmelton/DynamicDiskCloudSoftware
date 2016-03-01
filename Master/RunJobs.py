@@ -2,6 +2,11 @@
 Created on Jul 25, 2014
 
 @author: cmelton
+
+usage: python2.7 RunJobs.py --I test_instances.csv --D test_disks.csv --P yourprojectname --PM test.pem --E somelettersandnumbers@developer.gserviceaccount.com --RD /home/yourusername/ --SD ./
+
+When run as main this program will boot a cloud compute workflow as specified in test_disks.csv and test_instances.csv. 
+
 '''
 from optparse import OptionParser
 import LogFile, time, imp, os
@@ -11,9 +16,9 @@ from JobManager import JobManager
 # this functions gets the command line options for running the program
 def getOptions():
     parser = OptionParser()
-    parser.add_option("--I", dest = "InstancesFile", help = "this should be a file with info about the job",
+    parser.add_option("--I", dest = "InstancesFile", help = "this specifies a csv files with information about the instances to boot in this workflow",
                       metavar = "FILE", type = "string", default = "./test_instances.csv")
-    parser.add_option("--D", dest = "DisksFile", help = "this should be a file with info about the job",
+    parser.add_option("--D", dest = "DisksFile", help = "this specifies a csv file with information about the disks to boot in this workflow",
                       metavar = "FILE", type = "string", default = "./test_disks.csv")
     parser.add_option("--L", dest = "logFilePath", help = "path/name of log file to be output"+
                       "concurrently", metavar = "FILE", default = "logFileTest.txt", type = "string")
@@ -21,12 +26,12 @@ def getOptions():
                       metavar = "STRING", 
                       default = "", 
                       type = "string")
-    parser.add_option("--AA", dest="authAccount", help = "auth account for gcloud access, needs to be a listed account with gcloud auth list on all instance images",
+    parser.add_option("--AA", dest="authAccount", help = "auth account for gcloud access, needs to be a listed account with gcloud auth list on all instance images, when worker nodes start this account will be set as the active account",
                       metavar = "STRING")
-    parser.add_option("--P", dest = "projectID", help = "projectID", metavar = "STRING", 
-                      default = "gbsc-gcp-lab-snyder", #"stanford.edu:coral-pipe-530", 
+    parser.add_option("--P", dest = "projectID", help = "Google project ID", metavar = "STRING", 
+                      default = "gbsc-gcp-lab-snyder",  
                       type = "string")
-    parser.add_option("--PM", dest = "pemFile", help = "path to pem file", 
+    parser.add_option("--PM", dest = "pemFile", help = "path to pem file for service account", 
                       metavar = "FILE", default = "", 
                       type = "string")
     parser.add_option("--DC", dest = "dataCenter", help = "name of default data center", metavar = "STRING",

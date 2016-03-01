@@ -2,6 +2,9 @@
 Created on Jul 25, 2014
 
 @author: cmelton
+
+This file contains code to parse the disk and instance csv specification files.
+
 '''
 
 from Disks import Disk
@@ -25,9 +28,9 @@ class JobAndDiskFileReader(object):
         self.log=log
         self.rootdir=rootdir
         self.StackdriverAPIKey = StackdriverAPIKey
-        self.activateStackDriver= activateStackDriver
-#         print "JobAndDiskFileReader", self.rootdir, self.StackdriverAPIKey, self.activateStackDriver 
+        self.activateStackDriver= activateStackDriver 
     
+    # tries a command again if errors and then returns none if command continues to fail
     def trycommand(self, func, *args, **kwargs):
         retries = 10
         tries = 0
@@ -72,6 +75,7 @@ class JobAndDiskFileReader(object):
         else:
             return dataString
     
+    # parse specifications in disk file
     def readDisks(self, DisksFile, myDriver, log):
         f = open(DisksFile, "rU")
         reader = csv.reader(f)
@@ -110,6 +114,7 @@ class JobAndDiskFileReader(object):
                                                    init_source=newDiskInfo['init_source'], shutdown_dest=newDiskInfo["shutdown_dest"]) 
         return result
     
+    # parse specifications ininstance file
     def readInstances(self, InstancesFile, myDriver, disks, log):
         f = open(InstancesFile, "rU")
         reader = csv.reader(f)
@@ -193,11 +198,9 @@ class JobAndDiskFileReader(object):
                                                      activateStackDriver= (self.activateStackDriver==True), numLocalSSD=newInstInfo['numLocalSSD'],
                                                      localSSDInitSources = newInstInfo['localSSDInitSources'].split("|"),
                                                      localSSDDests = newInstInfo['localSSDDests'].split("|"))
-#                 name, node_params, depedencies, read_disks, read_write_disks, boot_disk, myDriver, script, log, 
-#                  rootdir="/home/cmelton/", scriptAsParam=True, preemptible=True, StackdriverAPIKey="",
-#                  activateStackDriver=False
         return result
     
+    # reads in disk and instance data
     def readInJobInfo(self):
         self.jobids = set()
         disks=self.readDisks(self.disk_csv_file, self.myDriver, self.log)

@@ -2,6 +2,9 @@ from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 import sys, time
 
+'''
+This file contains the model for disks.
+'''
 
 class Disk:
     def __init__(self, name, size, location, snapshot, myDriver, image, instanceNames, log, disk_type = 'pd-standard', init_source="", shutdown_dest=""):
@@ -29,32 +32,32 @@ class Disk:
     def __repr__(self):
         return self.name
 
-    # removes content that should not be on the disk (i.e. content saved to disk if a prior instance was shutdown prior to completing)
-
+    # this method returns a string that is a command to be run on the instance mounting this disk
+    # thie command calls a program that removes content that should not be on the disk 
+    # (i.e. content saved to disk if a prior instance was shutdown prior to completing)
     def contentRestore(self, restoreProgramPath):
         return restoreProgramPath+ " --P /mnt/"+self.name +" --F /mnt/"+self.name+"/"+"disk.content"
 
-    # saves the directories and files stored on the disk 
-
+    # in concert with the above method this one calls a program that saves the directories and files stored on the disk
+    # this creates a disk content file that the contentResetore program uses to know what the last saved state of the disk
+    # was, these commands together allow the user to use preemptible VMs and as long as no files were deleted or altered, 
+    # return the disk to the prior state and rerun the instance if it gets preempted
     def contentSave(self, saveProgramPath):
         return saveProgramPath+ " --P /mnt/"+self.name +" --F /mnt/"+self.name+"/"+"disk.content"
 
-    # returns a script to initialize drive from some source (i.e. another disk or from a storage bucket)
-
+    # this method reteurns a command to initialize a disk from some source (i.e. another disk or from a storage bucket)
     def initialization_script(self):
         if self.init_source != "":
             return "gsutil rsync -r "+self.init_source+" /mnt/"+self.name
         return ""
     
-    # returns a script to save disk contents to dest directory
-    
+    # this method returns a script to save disk contents to dest directory (i.e. another disk or a storage bucket)
     def shutdown_save_script(self):
         if self.shutdown_dest != "":
             return "gsutil rsync -r /mnt/"+self.name+" "+self.shutdown_dest
         return ""
 
-    # returns a script for mounting the disk
-    
+    # this method returns a command for mounting this disk
     def mount_script(self, isWrite):
         result="mkdir -p /mnt/"+self.name
         if self.formatted:
@@ -67,37 +70,43 @@ class Disk:
         self.formatted=True
         return result
     
+    # this methods returns a command for unmounting this disk
     def unmount_script(self):
         result = "umount /mnt/"+self.name
         return result 
     
+    # given a list of libcloud disks this method associates the libcloud disk with this disk class if
+    # the name matches 
     def setDisk(self, disks):
         for disk in disks:
             if disk.name==self.name:
                 self.disk=disk
                 self.created=True
                 self.formatted=True
-        
+    
+    # this method returns a tab delimited data in a dictionary with information about this disk
     def tabDelimSummary(self):
         return {"header":"\t".join(["name", "size", "location", "snapshot", "image", 
                                     "myDriver", "created", "destroyed", "disk", "instanceNames", "log"]), 
                 "values":"\t".join(map(lambda x: str(x), [self.name, self.size, self.location, self.snapshot, self.image, 
                           self.myDriver, self.created, self.destroyed, self.disk, self.instanceNames, self.log]))}
 
+    # prints text data to a log file
     def printToLog(self, text):
         output=self.name+"\t"+text
         self.log.write(output)
 
+    # this method returns tab delimited data about this disk as a string 
     def toString(self):
         tabDelim=self.tabDelimSummary()
         return("\n".join([tabDelim["header"],tabDelim["values"]]))
-#         return("\n".join(map(lambda x: "\t"+str(x), [self.name, self.size, self.location, self.snapshot, self.image, 
-#                           self.myDriver, self.created, self.destroyed, self.disk, self.instanceNames, self.log])))
 
+    # adds the names of the instances that this disk will be associated with
     def addInstance(self, instanceName):
         if instanceName not in self.instanceNames:
             self.instanceNames.append(instanceName)
 
+    # this method creates the disk in the cloud
     def create(self):
         self.printToLog("trying to create disk... destroyed: "+str(self.destroyed)+" created: "+str(self.created)+" None: "+str(self.disk==None))
         if self.destroyed or not self.created:
@@ -108,11 +117,13 @@ class Disk:
         else:
             self.printToLog("did not create disk on GCE")
     
+    # this command pings the GCE API and updates this disk with the libcloud disk if it exists
     def updateDisk(self):
         self.printToLog("updating disk "+self.name)
         self.disk=self.trycommand(self.myDriver.ex_get_volume, self.name)
         if self.disk == None: self.destroyed=True
     
+    # this method destroys this disk
     def destroy(self):
         self.updateDisk()
         if self.created and not self.destroyed:
@@ -122,34 +133,32 @@ class Disk:
         self.destroyed=True
         self.disk = None
 
+    # this method destroys this disk if no other instance will be using this disk
     def destroyifnotneeded(self, instances):
         if instances!=None:
-            # for each instance look to see if the disk is needed, if it is needed and the instance is not complete don't destroy (ie return)
-#             disks_current_insts=[]
             for instance_name in instances:
                 inst = instances[instance_name]
                 disk_names=map(lambda x: x.name, inst.read_disks+inst.read_write_disks)
                 if self.name in disk_names:
-#                     print "for destroy if not needed, checking status of: "+instance_name+" "+inst.status
-#                     if not inst.destroyed: 
-#                         disks_current_insts.append(inst)
                     if instances[instance_name].status!="complete":
                         return
             print "should destroy "+self.name
-#             for i in disks_current_insts: self.detach(i)
             self.destroy()
 
+    # this method attaches this disk to an instance, this is necessar for GCE instance to be able to mount this disk
     def attach(self, instance):
         self.printToLog("attached disk to "+instance.name+" on GCE")
         if instance.node!=None:
             self.trycommand(self.disk.attach, instance.node)
     
+    # this method detaches the disk from the instance
     def detach(self, inst):
         if self.created and not self.destroyed:
             self.printToLog("trying to detach disk on GCE from "+inst.name)
             self.trycommand(self.myDriver.detach_volume, self.disk, inst.node)
             self.printToLog("detached disk on GCE from "+inst.name)
 
+    # this meethod tries to execute a command a certain number of times before returning None
     def trycommand(self, func, *args, **kwargs):
         retries = 1
         tries = 0

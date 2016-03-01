@@ -2,20 +2,15 @@
 Created on Jul 25, 2014
 
 @author: cmelton
+
+This file contains a custom subclass of libcloud GCENodeDriver. At the time of coding this, the libcloud GCENodeDriver did not
+have the ability to allow service accounts in create_node. I've since also added the ability to specify local ssd drives and the 
+preemptible VMs.
+
 '''
 from libcloud.compute.drivers.gce import GCENodeDriver
 import urllib
 
-# from libcloud.common.google import GoogleBaseError
-# class InvalidRequestError(GoogleBaseError):
-#     def __init__(self, value, http_code, code, driver=None):
-#         super(InvalidRequestError, self).__init__(value, http_code, driver)
-#     
-#     def __str__(self):
-#         return self.__repr__()
-#     
-#     def __repr__(self):
-#         return str(self.http_code)+": "+str(self.value)
 
 class GCEManager(GCENodeDriver):
     '''
@@ -24,23 +19,25 @@ class GCEManager(GCENodeDriver):
     '''
     def __init__(self, user_id, key, auth_account, datacenter=None, project=None,
                  auth_type=None, **kwargs):
-#         print user_id, key
         self.auth_account = auth_account
         super(GCEManager, self).__init__(user_id, key, datacenter=datacenter, project=project, auth_type=auth_type, **kwargs)
     
+    # returns disk data in format for API call
     def _diskToDiskData(self, Disk):
         return {'kind': 'compute#attachedDisk',
                 'boot': False,
-                'type': 'PERSISTENT', #'pd-standard',
+                'type': 'PERSISTENT', 
                 'mode': Disk.mode,
                 'deviceName': Disk.disk.name,
                 'autoDelete': False,
                 'zone': Disk.disk.extra['zone'].extra['selfLink'],
                 'source': Disk.disk.extra['selfLink']}
     
+    # returns disk data in format for API call
     def _disksToDiskData(self, Disks):
         return map(self._diskToDiskData, Disks)
 
+    # returns a list of nodes
     def list_nodes(self, ex_zone=None, regex=""):
         """
         Return a list of nodes in the current zone or all zones.
@@ -79,6 +76,7 @@ class GCEManager(GCENodeDriver):
                 list_nodes = [self._to_node(i) for i in response['items']]
         return list_nodes
     
+    # returns a list of volumes
     def list_volumes(self, ex_zone=None, regex=""):
         """
         Return a list of volumes for a zone or all.
@@ -118,29 +116,18 @@ class GCEManager(GCENodeDriver):
                                 response['items']]
         return list_volumes
 
-    def localSSDData(self, location, numDisks=1):
-#         disk_type_local_ssd = 
-        return [{#'kind': 'compute#attachedDisk',
-                "type": "SCRATCH",
+    # returns local ssd disk data for API call
+    def localSSDData(self, location, numDisks=1): 
+        return [{"type": "SCRATCH",
                 "deviceName": "local-ssd-"+str(i),
-                
-                 #'local-ssd',
-#                 'type': 'local-ssd',
-#                 'mode': 'READ_WRITE',
-#                 'boot': False,
                 "interface": "SCSI",
-#                 'name': "local-ssd-"+str(i),
-#                 "deviceName": "local-ssd-"+str(i),
                 "initializeParams": {
                                      "diskType": self.ex_get_disktype('local-ssd', zone=location).extra['selfLink']
                                      },
                  "autoDelete": True
-#                 "initializeParams": self.ex_get_disktype('local-ssd', zone=location).extra['selfLink'] #{"diskType": "https://www.googleapis.com/compute/v1/projects/gbsc-gcp-lab-snyder/zones/us-central1-a/diskTypes/local-ssd"}
-#"https://www.googleapis.com/compute/v1/projects/"+self.project+"/zones/"+location+"/diskTypes/local-ssd"}
                 } for i in range(min(numDisks, 4))]
     
-    
-    
+    # creates a new node/instance
     def create_node(self, name, size, image, location=None,ex_network='default', 
                     ex_tags=None, ex_metadata=None,ex_boot_disk=None, 
                     use_existing_disk=True, external_ip='ephemeral', serviceAccountScopes=None, additionalDisks=[],
@@ -176,8 +163,6 @@ class GCEManager(GCENodeDriver):
         if log != None:
             log.write("request: "+str(request))
             log.write("node data: "+str(node_data))
-#         print "request", request
-#         print "node data", str(node_data)
         self.connection.async_request(request, method='POST', data=node_data)
 
         return self.ex_get_node(name, location.name)

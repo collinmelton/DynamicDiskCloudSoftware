@@ -19,7 +19,6 @@ class JobManager(object):
         self.disk_csv_file=disk_csv_file
         self.myDriver=myDriver
         self.log=log
-#         print "JobManager", rootdir, StackdriverAPIKey, activateStackDriver
         jobInfoReader=JobAndDiskFileReader(job_csv_file, disk_csv_file, myDriver, log, rootdir, StackdriverAPIKey=StackdriverAPIKey, activateStackDriver=activateStackDriver)
         self.instances, self.disks = jobInfoReader.readInJobInfo()
         self.instanceManager=InstanceManager(myDriver, self.instances, storage_directory, log, rootdir)
@@ -31,16 +30,12 @@ class JobManager(object):
     
     def updateRunningInstanceCount(self):
         self.running_instances=sum([1 for inst in self.instances.values() if inst.created and not inst.destroyed])
-#         print self.running_instances, "jobs running"
-#         for j in self.instances:
-#             print j, self.instances[j].created, self.instances[j].destroyed
         
     # returns true if jobs remain, false otherwise
     def remainingJobs(self):
         for job in self.instances:
             if (not self.instances[job].started()): return True
             if (self.instances[job].status in ["failed", "gce error"]): return True
-#              and (not self.instances[job].destroyed and not self.instances[job].status in ["failed", "gce error"]): return True
         return False
     
     # starts all jobs that are ready to run

@@ -2,21 +2,14 @@
 Created on Jul 31, 2014
 
 @author: cmelton
+
+some code to make html pages from instance performance and status data, haven't used in a while and it doesn't look 
+like I documented this well so use at your own risk!
+
 '''
 
 import os, subprocess, time, pickle, sys, csv, gviz_api, pickle, datetime
 from InstanceData import *
-
-
-# add GCE project to path
-# clusterPath="/home/cmelton/GCE_Cluster"
-# if os.path.exists(clusterPath):
-#     sys.path.insert(0, clusterPath)
-#     from Worker.InstanceData import *
-# from Worker.InstanceData import InstanceData
-# from Worker import InstanceData
-# try: from Worker.InstanceData import *
-# except: print "couldn't import worker'"
 
 from optparse import OptionParser
 

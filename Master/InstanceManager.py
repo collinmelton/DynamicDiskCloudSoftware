@@ -2,6 +2,9 @@
 Created on Jul 25, 2014
 
 @author: cmelton
+
+This file contans code to retrieve instance data from workers and to parse this data.
+
 '''
 import os, subprocess, time, pickle, sys, csv
 
@@ -33,7 +36,6 @@ class InstanceManager(object):
         errored=True
         i=0
         while errored:
-#             errored=(subprocess.call(['gcutil', 'pull', instance_name, myfile, destination])!=0)
             errored=(subprocess.call(['scp', '-o', 'stricthostkeychecking=no', '-o', 'UserKnownHostsFile=/dev/null', instance_name+":"+myfile, destination])!=0)
             if errored:
                 i+=1
@@ -55,9 +57,6 @@ class InstanceManager(object):
     
     # returns loaded instance data object as instance of InstanceData
     def loadInstanceData(self, instance_name):
-#         f=open(self.instanceInfo[instance_name], 'r')
-#         savedData=pickle.load(f)
-#         f.close()
         return InstanceData(instance_name, "None", self.instanceInfo[instance_name])
 
     # get status of instance
@@ -77,10 +76,9 @@ class InstanceManager(object):
             return "ssh error"
         # load instance data and retrieve status
         d=self.loadInstanceData(instance_name)
-#         print d.status()
-#         print d.summary()
         return d.status()
     
+    # prints instance data to csv format
     def printInstanceDataToCSV(self, pickleDirectory, filenamebase):
         perf_csvfile = open("performance_"+filenamebase+".csv", 'wb')
         perf_datawriter = csv.writer(perf_csvfile)

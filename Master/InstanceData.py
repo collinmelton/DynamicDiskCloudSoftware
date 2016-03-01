@@ -1,3 +1,10 @@
+'''
+
+This file contains classes to model instance performance and command completion data. This is replicated from a file that lives in the Worker folder but 
+is necessary to parse the pickled instance data file. 
+
+'''
+
 
 import datetime, psutil, os, subprocess, thread, pickle
 
@@ -181,17 +188,11 @@ class Command():
                        "Stop": ("string", "End Time"),
                        "Finished": ("boolean", "Finished"),
                        "Failed": ("boolean", "Failed")
-#                        ,
-#                        "Command": ("string", "Command"),
-#                        "Result": ("string", "Result")
                        }
         result= {"Start": str(self.start_time),
                  "Stop": str(self.end_time),
                  "Finished": self.finished,
                  "Failed": self.failed
-#                  ,
-#                  "Command": self.command,
-#                  "Result": self.result
                  }
         return (description, result)
     
@@ -356,10 +357,6 @@ class InstanceData(object):
         else: return "not finished"  
     
     def update_status(self):
-#         statuses = [c.getStatus() for c in self.command_data.commands]
-#         if "failed" in statuses: return "failed"
-#         if "not finished" in statuses: return "started"
-#         return "complete"
         last_command=self.command_data.commands[self.command_data.currentCommand-1]
         if last_command.failed: self.command_data.status="failed"
         if last_command.finished and not last_command.failed and self.command_data.currentCommand>=len(self.command_data.commands):
