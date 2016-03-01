@@ -6,6 +6,7 @@ This software is designed to run genomics workflows on the Google Compute Engine
 - [Configure GCE Image](#configure-gce-image)
 - [Get Service Account Authentication Info](#get-service-account-authentication-info) 
 - [Run Test](#run-test) 
+- [Web Server Version](#web-server)
 
 # Get Setup with GCE
 Get a GCE Account and setup a Google Cloud Storage bucket. URI should look something like this gs://bucketname/
@@ -121,4 +122,7 @@ You should make a pem file and note your service account email address in the fo
 	** Use the GCE Instance used to create the image above or make a new instance with access to compute and storage authorized with the image you created above. **
 	** Navigate to the directory for this project then go to the Master folder. **
 	python2.7 RunJobs.py --I test_instances.csv --D test_disks.csv --P yourprojectname --PM test.pem --E somelettersandnumbers@developer.gserviceaccount.com --RD /home/yourusername/ --SD ./
+	
+# Web Server Version
+I am developing an updated version of the software that runs a webserver (link coming soon). This version allows the user to generate a workflow, launch a workflow, and view progress and performance of the workflow as it runs.
 	
