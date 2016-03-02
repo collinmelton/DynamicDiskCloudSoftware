@@ -173,4 +173,4 @@ The instance file contains information including instance names, types, commands
 I am developing an updated version of the software that runs a webserver (link coming soon). This version allows the user to generate a workflow, launch a workflow, and view progress and performance of the workflow as it runs.
 
 # Alternative Licensing
-This project is licensed open source under GNU GPLv3. To inquire about alternative licensing options please contact the Stanford Office of Technology Licensing (www.otl.stanford.edu).
+This project is licensed open source under GNU GPLv2. To inquire about alternative licensing options please contact the Stanford Office of Technology Licensing (www.otl.stanford.edu).
