@@ -5,8 +5,10 @@ This software is designed to run genomics workflows on the Google Compute Engine
 - [Get Setup with GCE](#get-setup-with-gce)
 - [Configure GCE Image](#configure-gce-image)
 - [Get Service Account Authentication Info](#get-service-account-authentication-info) 
+- [Constructing Disk and Instance CSV Files](#constructing-disk-and-instance-csv-files)
 - [Run Test](#run-test) 
 - [Web Server Version](#web-server-version)
+- [Alternative Licensing](#alternative-licensing)
 
 # Get Setup with GCE
 Get a GCE Account and setup a Google Cloud Storage bucket. URI should look something like this gs://bucketname/
@@ -116,6 +118,27 @@ In order to run the software you need to get a service account email address and
 
 You should make a pem file and note your service account email address in the format: numbersandletters@developer.gserviceaccount.com
 
+# Constructing Disk and Instance CSV Files
+The workflow is specified by the disk and instance files. There is no internal check for validity of your specified workflow so be careful to map it out and not make errors! Make sure names of instances and disks comply with GCE standards (Name must start with a lowercase letter followed by up to 62 lowercase letters, numbers, or hyphens, and cannot end with a hyphen).
+
+## Disk File
+The disk file contains information including disk names, types, and sizes. A description of columns to include in this file are as follows:
+Column Name | Description
+--- | ---
+notes | (optional) Any notes you want to include about this row.
+name | (required) The name of the disk. $JOBID and $JOBMULT variables in the name will be replaced with job id and job multiplicity variables at run time.
+size | (required) The size of the disk in GB.
+location | (required) Disk zone.
+snapshot | (required) Disk snapshot to use.
+image | (required) Disk image to use.
+job_multiplicity | (required) This is a string with variable names separated by the pipe &#124;.
+job_id | (required) The job id. Really this is just a scheme to replace the $HOBID variable in the name column with this value.
+disk_type | (required) The type of disk. Options are pd-standard or pd-ssd.
+init_source| (optional) A location to copy to disk when initialized. This can be cloud storage bucket/folder combo or another disk mounted to the initial instance.
+shutdown_dest | (optional) A location to save the disk contents to when the instance finishes. This can be cloud storage bucket/folder combo or another disk mounted to the instance.
+
+## Instance File
+The instance file contains information including instance names, types, commands to run, instance dependencies, and disks to mount. A description of columns to include in this file are as follows:
 
 # Run Test
 
@@ -125,4 +148,6 @@ You should make a pem file and note your service account email address in the fo
 	
 # Web Server Version
 I am developing an updated version of the software that runs a webserver (link coming soon). This version allows the user to generate a workflow, launch a workflow, and view progress and performance of the workflow as it runs.
-	
+
+# Alternative Licensing
+This project is licensed open source under GNU GPLv3. To inquire about alternative licensing options please contact the Stanford Office of Technology Licensing (www.otl.stanford.edu).
