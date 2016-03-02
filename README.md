@@ -126,38 +126,42 @@ The disk file contains information including disk names, types, and sizes. A des
 
 |Column Name | Description|
 |--- | ---|
-|notes | (optional) Any notes you want to include about this row.|
-|name | (required) The name of the disk. $JOBID and $JOBMULT variables in the name will be replaced with job id and job multiplicity |variables at run time.|
-|size | (required) The size of the disk in GB.|
-|location | (required) Disk zone.|
-|snapshot | (required) Disk snapshot to use.|
-|image | (required) Disk image to use.|
-|job_multiplicity | (required) This is a string with variable names separated by the pipe &#124;.|
-|job_id | (required) The job id. Really this is just a scheme to replace the $JOBID variable in the name column with this value.|
-|disk_type | (required) The type of disk. Options are pd-standard or pd-ssd.|
-|init_source| (optional) A location to copy to disk when initialized. This can be cloud storage bucket/folder combo or another disk mounted to the initial instance.|
-|shutdown_dest | (optional) A location to save the disk contents to when the instance finishes. This can be cloud storage bucket/folder combo or another disk mounted to the instance.|
+|notes | Any notes you want to include about this row.|
+|name | The name of the disk. $JOBID and $JOBMULT variables in the name will be replaced with job id and job multiplicity |variables at run time.|
+|size | The size of the disk in GB.|
+|location | Disk zone. Default is us-central-1a.|
+|snapshot | Disk snapshot to use. Default is None|
+|image | Disk image to use. Default is None|
+|job_multiplicity | This is a string with variable names separated by the pipe &#124;.|
+|job_id | The job id. Really this is just a scheme to replace the $JOBID variable in the name column with this value.|
+|disk_type | The type of disk. Options are pd-standard or pd-ssd.|
+|init_source| A location to copy to disk when initialized. This can be cloud storage bucket/folder combo or another disk mounted to the initial instance.|
+|shutdown_dest | A location to save the disk contents to when the instance finishes. This can be cloud storage bucket/folder combo or another disk mounted to the instance.|
+
+Note: To use default please write DEFAULT in place of specifying the column.
 
 ## Instance File
 The instance file contains information including instance names, types, commands to run, instance dependencies, and disks to mount. A description of columns to include in this file are as follows:
 
 |Column Name | Description|
 |--- | ---|
-|run | (required) TRUE or FALSE whether to use or ignore this row.|
-|notes | (optional) Any notes you want to include about this row.|
-|name | (required) The name of the instance. $JOBID and $JOBMULT variables in the name will be replaced with job id and job multiplicity |variables at run time.|
-|dependencies | (required) Names of instances that must complete before this instance is launched. Separate instance names by pipe &#124;.|
-|read_disks| (required) Names of disks separated by &#124; to mount in read mode.|
-|read_write_disks| (required) Names of disks separated by &#124; to mount in read/write mode.|
-|boot_disk| (required) Names of disk to use as a boot disk.|
-|script| (required) New line separated linux commands to run on instance|
-|image| (required) The image to use. I believe this is only used if no boot disk is specified in the disk file and otherwise the image on the boot disk is used.|
-|location| (required) The zone in which to boot the instance.|
-|ex_network| (optional) A network to specify (I've never ended up using this so it could be buggy.)|
-|ex_tags| (optional) Similar to ex_network this hasn't been tested but in theory should add tags to the instance.|
-|ex_metadata| (optional) Similar to ex_network this hasn't been tested but in theory should add metadata to the instance.|
-|job_multiplicity | (required) This is a string with variable names separated by the pipe &#124;. Variables will be added with a leading dash to replace $JOBMULTNODASH and without a dash for $JOBMULTNODASH|
-|job_id | (required) The job id. Really this is just a scheme to replace the $JOBID variable in the name column with this value. The variable will be added in place of $JOBID with a trailing dash.|
+|run | TRUE or FALSE whether to use or ignore this row.|
+|notes | Any notes you want to include about this row.|
+|name | The name of the instance. $JOBID and $JOBMULT variables in the name will be replaced with job id and job multiplicity |variables at run time.|
+|dependencies | Names of instances that must complete before this instance is launched. Separate instance names by pipe &#124;.|
+|read_disks| Names of disks separated by &#124; to mount in read mode.|
+|read_write_disks| Names of disks separated by &#124; to mount in read/write mode.|
+|boot_disk| Names of disk to use as a boot disk.|
+|script| New line separated linux commands to run on instance|
+|size| GCE instance specification (default is n1-standard-1).|
+|image| The image to use. I believe this is only used if no boot disk is specified in the disk file and otherwise the image on the boot disk is used. Default is None.|
+|location| The zone in which to boot the instance. (default is us-central1-a)|
+|ex_network| A network to specify (I've never ended up using this so it could be buggy.) Default is 'default'.|
+|ex_tags| Similar to ex_network this hasn't been tested but in theory should add tags to the instance.|
+|ex_metadata| Similar to ex_network this hasn't been tested but in theory should add metadata to the instance.|
+|job_multiplicity | This is a string with variable names separated by the pipe &#124;. Variables will be added with a leading dash to replace $JOBMULTNODASH and without a dash for $JOBMULTNODASH|
+|var_multiplicity| This is an old option I haven't used in a while. I belive the idea was that you put in pipe separated variables and it replaces $VARMULT with these variables pasted together is some useful fashion. I don't really like this option and I'm thinking of deprecating it. I believe I initially used it to get variable names formatted for combining files.|
+|job_id | The job id. Really this is just a scheme to replace the $JOBID variable in the name column with this value. The variable will be added in place of $JOBID with a trailing dash.|
 
 # Run Test
 
