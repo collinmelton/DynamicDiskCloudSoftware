@@ -170,7 +170,7 @@ The instance file contains information including instance names, types, commands
 	python2.7 RunJobs.py --I test_instances.csv --D test_disks.csv --P yourprojectname --PM test.pem --E somelettersandnumbers@developer.gserviceaccount.com --RD /home/yourusername/ --SD ./
 	
 # Web Server Version
-I am developing an updated version of the software that runs a webserver (link coming soon). This version allows the user to generate a workflow, launch a workflow, and view progress and performance of the workflow as it runs.
+I am developing an updated version of the software that runs a webserver (https://github.com/collinmelton/DDCloudServer). This version allows the user to generate a workflow, launch a workflow, and view progress and performance of the workflow as it runs.
 
 # Alternative Licensing
 This project is licensed open source under GNU GPLv2. To inquire about alternative licensing options please contact the Stanford Office of Technology Licensing (www.otl.stanford.edu).
