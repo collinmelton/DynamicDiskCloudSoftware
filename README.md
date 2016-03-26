@@ -19,7 +19,7 @@ In this section we will configure a GCE Image for use as the OS on both the Mast
 ## Boot GCE Instance
 From the GCE developers console boot a new instance. I've chosen CENTOS6.6 as the base image, but if you use a different base you may need to modify the software installation below. Make sure to enable full access to storage during setup. This is important because you will save you image to your Google Cloud Storage bucket. 
 
-## Install Software (for CENTOS6.6)
+## Install Software (for CENTOS6.7)
 1. SSH into the new instance. 
 
 2. Install Git
@@ -50,7 +50,7 @@ From the GCE developers console boot a new instance. I've chosen CENTOS6.6 as th
 	
 	sudo pip install httplib2
 	
-	** a bunch of crap to install python2.7, easyinstall, pip, and get PyCrypto etc **
+	** some additional commands to install python2.7, easyinstall, pip, and get PyCrypto etc **
 	
 	sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
 	 
@@ -91,12 +91,6 @@ From the GCE developers console boot a new instance. I've chosen CENTOS6.6 as th
 	ssh-add ~/.ssh/id_rsa
 
 	edit ~/.ssh/authorized keys by adding the key located in ~/.ssh/id_rsa.pub, in this setup the master running this image will have the same public key as the worker and we want the master to be able to ssh into the worker so we need to add the master's public key to the list of authorized keys 
-
-## Authorize the instance with gcloud auth login
-
-	** I also did an auth login so I could copy to my cloud storage bucket in next step, I didn't expect to need to do this as the instance should have been authorized to access cloud storage during creation, it might have to do with our project configuration settings or my misunderstanding of how things work
-	
-	gcloud auth login
 
 ## Create Image and Save to Cloud Storage
 
@@ -167,7 +161,11 @@ The instance file contains information including instance names, types, commands
 
 	** Use the GCE Instance used to create the image above or make a new instance with access to compute and storage authorized with the image you created above. **
 	** Navigate to the directory for this project then go to the Master folder. **
-	python2.7 RunJobs.py --I test_instances.csv --D test_disks.csv --P yourprojectname --PM test.pem --E somelettersandnumbers@developer.gserviceaccount.com --RD /home/yourusername/ --SD ./
+	Instance and disk files for a simple test run are in TestRuns/ named basictest_instances.csv and basictest_disks.csv
+	python2.7 RunJobs.py --I basictest_instances.csv --D basictest_disks.csv --P yourprojectname --PM test.pem --E somelettersandnumbers@developer.gserviceaccount.com --RD /home/yourusername/ --SD ./
+	
+	Instance command data are saved in pickle files in the 'storage directory' specified by the --SD option. You can view the results of a history file by using the following command:
+	python2.7 DynamicDiskCloudSoftware/Worker/printCommandHistory.py --H ~/a-node-1-step1.history.pickle
 	
 # Web Server Version
 I am developing an updated version of the software that runs a webserver (https://github.com/collinmelton/DDCloudServer). This version allows the user to generate a workflow, launch a workflow, and view progress and performance of the workflow as it runs.
