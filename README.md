@@ -92,12 +92,6 @@ From the GCE developers console boot a new instance. I've chosen CENTOS6.6 as th
 
 	edit ~/.ssh/authorized keys by adding the key located in ~/.ssh/id_rsa.pub, in this setup the master running this image will have the same public key as the worker and we want the master to be able to ssh into the worker so we need to add the master's public key to the list of authorized keys 
 
-## Authorize the instance with gcloud auth login
-
-	** I also did an auth login so I could copy to my cloud storage bucket in next step, I didn't expect to need to do this as the instance should have been authorized to access cloud storage during creation, it might have to do with our project configuration settings or my misunderstanding of how things work
-	
-	gcloud auth login
-
 ## Create Image and Save to Cloud Storage
 
 	sudo gcimagebundle -d /dev/sda -o /tmp/ --log_file=/tmp/abc.log
