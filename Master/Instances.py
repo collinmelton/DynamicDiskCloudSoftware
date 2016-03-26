@@ -198,7 +198,9 @@ class Instance:
         return result
     
     def _setActiveGcloudAuthAccount(self):
-        return "gcloud config set account "+self.myDriver.auth_account
+        if self.myDriver.auth_account!=None:
+            return "gcloud config set account "+self.myDriver.auth_account
+        else: return ""
     
     # package script in python script shell
     # the StartupWrapper.py program executes the script, saves the output to google cloud storage and updates the project meta data on start and completion
