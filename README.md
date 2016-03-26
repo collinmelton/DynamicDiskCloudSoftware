@@ -28,7 +28,7 @@ From the GCE developers console boot a new instance. I've chosen CENTOS6.6 as th
 	
 3. Clone this project and note project location
 
-	git clone git@github.com:collinmelton/DynamicDiskCloudSoftware.git
+	git clone https://github.com/collinmelton/DynamicDiskCloudSoftware.git
 	
 4. Install project specific dependencies
 
@@ -40,7 +40,7 @@ From the GCE developers console boot a new instance. I've chosen CENTOS6.6 as th
 	
 	** install pip, apache-libcloud, PyCrypto, and httplib2 **
 	
-	curl -o get-pip.py https://raw.githubusercontent.com/pypa/pip/master/contrib/get-pip.py
+	curl -o get-pip.py https://bootstrap.pypa.io/get-pip.py
 	
 	sudo python get-pip.py
 	 
@@ -110,7 +110,7 @@ From the GCE developers console boot a new instance. I've chosen CENTOS6.6 as th
 	
 	~/google-cloud-sdk/bin/gcutil --project "your_project_name" addimage cloudtest2 gs://yourbucketname/imagename.image.tar.gz
 	or 
-	gcloud compute images create cloudtest2 --source-uri gs://yourbucketname/imagename.image.tar.gz
+	gcloud compute images create ddtest --source-uri gs://yourbucketname/imagename.image.tar.gz
 
 
 # Get Service Account Authentication Info
